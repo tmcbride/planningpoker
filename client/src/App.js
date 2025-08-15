@@ -6,15 +6,26 @@ const socket = io("http://localhost:4000"); // Adjust if server is on another ho
 
 function App() {
   const [room, setRoom] = useState(null);
+  const [availableRooms, setAvailableRooms] = useState([]);
   const [name, setName] = useState("");
   const [roomId, setRoomId] = useState("");
   const [ticket, setTicket] = useState("");
 
   useEffect(() => {
-    socket.on("roomUpdate", (data) => {
-      setRoom(data);
-    });
+    socket.on("roomsList", setAvailableRooms);
+    return () => socket.off("roomsList");
+  }, []);
+
+  useEffect(() => {
+    socket.on("roomUpdate", (data) => setRoom(data)); // sets full room object
     return () => socket.off("roomUpdate");
+  }, []);
+
+  useEffect(() => {
+    const logEvent = (event, ...args) => console.log("Socket event received:", event, args);
+    socket.onAny(logEvent);
+
+    return () => socket.offAny(logEvent);
   }, []);
 
   // Auth / Room join
@@ -23,9 +34,11 @@ function App() {
     socket.emit("createRoom", { roomId, dealer: name });
   };
 
-  const joinRoom = () => {
-    if (!roomId || !name) return alert("Enter name & room ID");
-    socket.emit("joinRoom", { roomId, name });
+  const joinRoom = (roomIdToJoin) => {
+    if (!roomIdToJoin || !name) return alert("Enter name");
+
+    socket.emit("joinRoom", { roomId: roomIdToJoin, name });
+    setRoomId(roomIdToJoin); // <-- store roomId for voting
   };
 
   // Dealer actions
@@ -63,8 +76,17 @@ function App() {
         />
         <div>
           <button onClick={createRoom}>Create Room</button>
-          <button onClick={joinRoom}>Join Room</button>
         </div>
+
+        <ul>
+          {availableRooms.length === 0 && <li>No rooms available</li>}
+          {availableRooms.map(room => (
+            <li key={room.id}>
+              {room.id} ({room.playerCount} players)
+              <button onClick={() => joinRoom(room.id)}>Join</button>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
