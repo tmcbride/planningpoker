@@ -17,6 +17,15 @@ function App() {
   }, []);
 
   useEffect(() => {
+    socket.on("roomsList", setAvailableRooms);
+
+    // Ask server immediately on page load
+    socket.emit("requestRooms");
+
+    return () => socket.off("roomsList");
+  }, []);
+
+  useEffect(() => {
     socket.on("roomUpdate", (data) => setRoom(data)); // sets full room object
     return () => socket.off("roomUpdate");
   }, []);
@@ -37,9 +46,24 @@ function App() {
   const joinRoom = (roomIdToJoin) => {
     if (!roomIdToJoin || !name) return alert("Enter name");
 
+    // Save locally
+    localStorage.setItem("username", name);
+    localStorage.setItem("roomId", roomIdToJoin);
+
     socket.emit("joinRoom", { roomId: roomIdToJoin, name });
     setRoomId(roomIdToJoin); // <-- store roomId for voting
   };
+
+  useEffect(() => {
+    const savedName = localStorage.getItem("username");
+    const savedRoom = localStorage.getItem("roomId");
+
+    if (savedName && savedRoom) {
+      setName(savedName);
+      setRoomId(savedRoom);
+      socket.emit("joinRoom", { roomId: savedRoom, name: savedName });
+    }
+  }, []);
 
   // Dealer actions
   const setCurrentTicket = () => {
@@ -69,6 +93,9 @@ function App() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
+
+        <br/><br/>
+
         <input
           placeholder="Room ID"
           value={roomId}
@@ -108,7 +135,6 @@ function App() {
             onChange={(e) => setTicket(e.target.value)}
           />
           <button onClick={setCurrentTicket}>Set Ticket</button>
-          <button onClick={revealVotes}>Reveal Votes</button>
           <button onClick={resetVotes}>Reset Votes</button>
         </div>
       )}
