@@ -16,10 +16,10 @@ const io = new Server(server, {
     origin: "*"
   }
 });
+
 const ROOMS_KEY = "rooms";
 let rooms = {};
 let handlers;
-
 
 async function saveRooms() {
   await storage.setItem(ROOMS_KEY, rooms);
@@ -29,7 +29,7 @@ function broadcastRooms() {
   if (!rooms) return;
   const roomList = Object.keys(rooms).map(roomId => ({
     id: roomId,
-    playerCount: Object.values(rooms[roomId].users).length
+    playerCount: Object.values(rooms[roomId].voters).length
   }));
   console.log("Broadcasting rooms:", roomList);
   io.emit("roomsList", roomList);
@@ -45,8 +45,9 @@ io.on("connection", (socket) => {
   socket.on("requestRooms", () => handlers.requestRooms(socket));
   socket.on("resetVotes", (data) => handlers.resetVotes(data));
   socket.on("disconnect", () => handlers.disconnect(socket));
-  socket.on("clearRooms", () => { console.log("Clearing Rooms"); rooms = {}; broadcastRooms(); });
+  socket.on("clearRooms", () => { console.log("Clearing Rooms"); rooms = {}; saveRooms(); broadcastRooms(); });
   socket.on("leaveRoom", (data) => handlers.leaveRoom(socket, data));
+  socket.on("openRoom", (data) => handlers.openRoom(socket, data));
 
   broadcastRooms();
 });

@@ -1,30 +1,50 @@
+
 async function removeUserFromRoom(rooms, roomId, socket, saveRooms) {
   if (!rooms) return;
   const r = rooms[roomId];
-  if (r.users[socket.id]) {
-    delete r.users[socket.id];
+  if (r && r.voters && r.voters[socket.id]) {
+    delete r.voters[socket.id];
     delete r.votes[socket.id];
-    await saveRooms();
   }
+
+  if (r && r.viewers && r.viewers[socket.id]) {
+    delete r.viewers[socket.id];
+  }
+
+  await saveRooms();
 }
 
 module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
-  createRoom: async (socket, { roomId, dealer }) => {
-    rooms[roomId] = { dealer, users: {}, votes: {}, showVotes: false };
-    rooms[roomId].users[socket.id] = { name: dealer, role: "dealer" };
+  createRoom: async (socket, { roomId, name }) => {
+    rooms[roomId] = { viewers: {}, voters: {}, votes: {}, showVotes: false };
+    rooms[roomId].viewers[socket.id] = { name };
+
     socket.join(roomId);
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
     broadcastRooms();
   },
 
   joinRoom: async (socket, { roomId, name }) => {
-    console.log("User joined:", roomId, name);
+    console.log("Voter joined:", roomId, name);
 
     if (!rooms[roomId]) return;
     socket.join(roomId);
-    rooms[roomId].users[socket.id] = { name, role: "player" };
+    rooms[roomId].voters[socket.id] = { name };
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
-    socket.emit("roomUpdate", rooms[roomId]); // Ensure joining user gets update
+    socket.emit("roomUpdate", rooms[roomId]);
+    await saveRooms();
+    broadcastRooms();
+  },
+
+  openRoom: async (socket, { roomId, name }) => {
+    console.log("Voter joined:", roomId, name);
+
+    if (!rooms[roomId]) return;
+    socket.join(roomId);
+    rooms[roomId].viewers[socket.id] = { name };
+
+    io.to(roomId).emit("roomUpdate", rooms[roomId]);
+    socket.emit("roomUpdate", rooms[roomId]);
     await saveRooms();
     broadcastRooms();
   },
@@ -42,15 +62,13 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
   },
 
   vote: async (socket, { roomId, vote }) => {
-    console.log("Room ID: ", roomId);
     if (!rooms[roomId]) return;
     rooms[roomId].votes[socket.id] = vote;
 
     const room = rooms[roomId];
 
     // Check if all players have voted
-    const playerIds = Object.entries(room.users)
-      .filter(([id, user]) => user.role !== "dealer")
+    const playerIds = Object.entries(room.voters)
       .map(([id]) => id);
 
     const allVoted = playerIds.every(id => room.votes[id] !== undefined);
@@ -65,7 +83,7 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
   requestRooms: (socket) => {
     const roomList = Object.keys(rooms).map(roomId => ({
       id: roomId,
-      playerCount: Object.values(rooms[roomId].users).length
+      playerCount: Object.values(rooms[roomId].voters).length
     }));
     socket.emit("roomsList", roomList);
   },
@@ -87,10 +105,10 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
 disconnect:  async (socket) => {
   for (const roomId of Object.keys(rooms)) {
     const r = rooms[roomId];
-    if (r.users[socket.id]) {
-      delete r.users[socket.id];
+    if (r && r.voters && r.voters[socket.id]) {
+      delete r.voters[socket.id];
+      delete r.viewers[socket.id];
       delete r.votes[socket.id];
-      if (Object.keys(r.users).length === 0) delete rooms[roomId];
       await saveRooms();
       broadcastRooms();
       io.to(roomId).emit("roomUpdate", rooms[roomId]);

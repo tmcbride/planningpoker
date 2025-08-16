@@ -33,7 +33,7 @@ function App() {
   // Auth / Room join
   const createRoom = () => {
     if (!roomId || !name) return alert("Enter name & room ID");
-    socket.emit("createRoom", { roomId, dealer: name });
+    socket.emit("createRoom", { roomId, name: name });
   };
 
   // Auth / Room join
@@ -48,8 +48,15 @@ function App() {
     localStorage.setItem("username", name);
     localStorage.setItem("roomId", roomIdToJoin);
 
-    socket.emit("joinRoom", { roomId: roomIdToJoin, name });
+    socket.emit("joinRoom", { roomId: roomIdToJoin, name: name });
     setRoomId(roomIdToJoin); // <-- store roomId for voting
+  };
+
+  const openRoom = async (roomIdToJoin) => {
+    if (!roomIdToJoin || !name) return alert("Enter name");
+
+    localStorage.setItem("roomId", roomIdToJoin);
+    socket.emit("openRoom", { roomId: roomIdToJoin, name: name});
   };
 
   const leaveRoom = () => {
@@ -74,10 +81,6 @@ function App() {
   const setCurrentTicket = () => {
     if (!ticket) return alert("Enter a ticket");
     socket.emit("setTicket", { roomId, ticket });
-  };
-
-  const revealVotes = () => {
-    socket.emit("revealVotes", { roomId });
   };
 
   const resetVotes = () => {
@@ -116,6 +119,7 @@ function App() {
           {availableRooms.map(room => (
             <li key={room.id}>
               {room.id} ({room.playerCount} players)
+              <button onClick={() => openRoom(room.id)}>Open</button>
               <button onClick={() => joinRoom(room.id)}>Join</button>
             </li>
           ))}
@@ -124,16 +128,21 @@ function App() {
     );
   }
 
-  const currentUserRole = room.users[socket.id]?.role;
+  const isViewer = !!room?.viewers?.[socket.id];
 
-  let isDealer = currentUserRole === "dealer";
   return (
     <div className="app">
       <h2>Room: {roomId}</h2>
-      <p>Dealer: {room.dealer}</p>
+      <h4>Viewers:</h4>
+      <ul>
+        {room && room.viewers && Object.values(room.viewers)
+          .map((user, idx) => (
+            <li key={idx}>{user.name}</li>
+          ))}
+      </ul>
       <h3>Current Ticket: {room.currentTicket || "None"}</h3>
 
-      {isDealer && (
+      {isViewer && (
         <div className="dealer-controls">
           <input
             placeholder="Ticket"
@@ -142,10 +151,11 @@ function App() {
           />
           <button onClick={setCurrentTicket}>Set Ticket</button>
           <button onClick={resetVotes}>Reset Votes</button>
+          <button onClick={leaveRoom}>Leave Room</button>
         </div>
       )}
 
-      {!isDealer && (
+      {!isViewer && (
         <div className="vote-buttons">
           {[1, 2, 3, 5, 8, 13].map((v) => (
             <button key={v} onClick={() => vote(v)}>
@@ -160,14 +170,13 @@ function App() {
 
       <h3>Players’ Hands</h3>
       <div className="cards">
-        {Object.entries(room.users)
-          .filter(([_, user]) => user.role !== "dealer")
-          .map(([id, user]) => {
+        {room && room.voters && Object.entries(room.voters)
+          .map(([id, voter]) => {
             const voteValue = room.votes[id];
             const show = room.showVotes || id === socket.id;
             return (
               <div key={id} className="card">
-                <div className="card-name">{user.name}</div>
+                <div className="card-name">{voter.name}</div>
                 <div className="card-value">
                   {show
                     ? voteValue ?? "—"
