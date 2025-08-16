@@ -1,4 +1,4 @@
-async function removeVoterFromRoom(rooms, roomId, socket) {
+function removeVoterFromRoom(rooms, roomId, socket) {
   if (!rooms || !rooms[roomId]) return false;
 
   let found = false;
@@ -14,13 +14,11 @@ async function removeVoterFromRoom(rooms, roomId, socket) {
   return found;
 }
 
-async function removeViewerFromRoom(rooms, roomId, socket) {
-  console.log("Removing viewer:", socket.id, "from room:", roomId);
+function removeViewerFromRoom(rooms, roomId, socket) {
   if (!rooms || !rooms[roomId]) return false;
 
   let found = false;
   const r = rooms[roomId];
-  console.log("Removing voter:", socket.id, "from room:", roomId, " Room: ", r);
   if (r.viewers && r.viewers[socket.id]) {
     console.log("Removing viewer:", socket.id, "from room:", roomId);
     delete r.viewers[socket.id];
@@ -30,7 +28,7 @@ async function removeViewerFromRoom(rooms, roomId, socket) {
   return found;
 }
 
-module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
+module.exports = (io, rooms, saveRooms) => ({
   createRoom: async (socket, {roomId, name}) => {
     rooms[roomId] = {viewers: {}, voters: {}, votes: {}, showVotes: false};
     rooms[roomId].viewers[socket.id] = {name};
@@ -38,7 +36,6 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
     socket.join(roomId);
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
     console.log(rooms);
-    broadcastRooms();
   },
 
   joinRoom: async (socket, {roomId, name}) => {
@@ -135,14 +132,21 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
   },
 
   disconnect: async (socket) => {
+    console.log("Voter disconnected:", socket.id);
     for (const roomId of Object.keys(rooms)) {
+      console.log("Looking for:", socket.id, " in ", rooms[roomId]);
+
       let found = removeVoterFromRoom(rooms, roomId, socket);
-      found ||= removeViewerFromRoom(rooms, roomId, socket);
+      console.log("Found voter: ", found);
+      if (!found) {
+        found = removeViewerFromRoom(rooms, roomId, socket);
+        console.log("Found viewer: ", found);
+      }
 
       if (found) {
         await saveRooms();
-        broadcastRooms();
         io.to(roomId).emit("roomUpdate", rooms[roomId]);
+        break;
       }
     }
   },

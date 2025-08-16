@@ -25,18 +25,6 @@ async function saveRooms() {
   // await storage.setItem(ROOMS_KEY, rooms);
 }
 
-function broadcastRooms() {
-  if (!rooms) {
-    io.emit("roomsList", []);
-  };
-  const roomList = Object.keys(rooms).map(roomId => ({
-    id: roomId,
-    playerCount: Object.values(rooms[roomId].voters).length
-  }));
-  console.log("Broadcasting rooms:", roomList);
-  io.emit("roomsList", roomList);
-}
-
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
@@ -47,10 +35,19 @@ io.on("connection", (socket) => {
   socket.on("requestRooms", () => handlers.requestRooms(socket));
   socket.on("resetVotes", (data) => handlers.resetVotes(data));
   socket.on("disconnect", () => handlers.disconnect(socket));
-  socket.on("clearRooms", () => { console.log("Clearing Rooms"); rooms = {}; saveRooms(); broadcastRooms(); });
+  socket.on("clearRooms", async () => { console.log("Clearing Rooms"); rooms = {}; await saveRooms(); });
   socket.on("leaveRoomViewer", (data) => handlers.leaveRoomViewer(socket, data));
   socket.on("leaveRoomVoter", (data) => handlers.leaveRoomVoter(socket, data));
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));
+});
+
+app.get("/rooms", (req, res) => {
+  const roomList = Object.keys(rooms).map(roomId => ({
+    id: roomId,
+    playerCount: Object.values(rooms[roomId].voters).length
+  }));
+
+  res.json(roomList);
 });
 
 // // ---------- Initialize storage ----------
@@ -61,6 +58,6 @@ io.on("connection", (socket) => {
 //   handlers = getHandlers(io, rooms, saveRooms, broadcastRooms);
 // })();
 
-handlers = getHandlers(io, rooms, saveRooms, broadcastRooms);
+handlers = getHandlers(io, rooms, saveRooms);
 
 server.listen(4000, "0.0.0.0", () => console.log("Server running on port 4000"));

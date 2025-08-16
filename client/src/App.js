@@ -11,11 +11,17 @@ function App() {
   const [roomId, setRoomId] = useState("");
   const [ticket, setTicket] = useState("");
 
-  useEffect(() => {
-    socket.on("roomsList", setAvailableRooms);
-    socket.emit("requestRooms");
+  function getRoomList() {
+    fetch("http://localhost:4000/rooms")
+      .then(res => res.json())
+      .then(data => {
+        setAvailableRooms(data);
+      })
+      .catch(err => console.error("Error fetching rooms:", err));
+  }
 
-    return () => socket.off("roomsList");
+  useEffect(() => {
+    getRoomList();
   }, []);
 
   useEffect(() => {
@@ -139,6 +145,7 @@ function App() {
         </div>
 
         <ul>
+          <button onClick={getRoomList}>Refresh Rooms</button>
           {availableRooms.length === 0 && <li>No rooms available</li>}
           {availableRooms.map(room => (
             <li key={room.id}>
