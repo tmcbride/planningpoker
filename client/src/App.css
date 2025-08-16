@@ -39,18 +39,40 @@
 .app {
   font-family: sans-serif;
   padding: 1rem;
+  min-width: 900px
 }
 
-.login {
+.lobby {
   padding: 2rem;
+  min-width: 900px;
 }
 
 .dealer-controls input {
   margin-right: 0.5rem;
 }
 
+.room-header {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.leave-button {
+  float: right;
+  margin-left: auto;
+}
+
+.vote-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
 .vote-buttons button {
   margin: 0.2rem;
+  width: 50px
 }
 
 .cards {
@@ -59,6 +81,8 @@
   gap: 1rem;
   margin-top: 3rem;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-name {
@@ -69,8 +93,8 @@
 
 .flip-card {
   background-color: transparent;
-  width: 150px;
-  height: 200px;
+  width: 130px;
+  height:170px;
   perspective: 1000px; /* Remove this if you don't want the 3D effect */
 }
 
@@ -116,16 +140,79 @@
 }
 
 button {
-  border: none;
-  background-color: #0037de;
+  background: linear-gradient(135deg, #4e8cff, #1c60d6);
   color: white;
-  margin: 10px;
-  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 1.2rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  margin: 0.2rem 0.5rem 0 0;
 }
 
+button:hover {
+  background: linear-gradient(135deg, #5b96ff, #285bd6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.25);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 h2 {
   margin: 10px
+}
+
+.debug {
+  height: 200px;
+  font-size: 20px;
+  overflow-y: scroll;
+  border: 1px solid black;
+}
+
+input {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+  box-sizing: border-box;
+  margin-right: 0.5rem;
+}
+
+input:focus {
+  border-color: #4e8cff;
+  box-shadow: 0 0 0 3px rgba(78, 140, 255, 0.3);
+}
+
+input::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.roomList {
+  margin: 2rem;
+}
+
+.roomRow {
+  margin-top: 2rem;
 }

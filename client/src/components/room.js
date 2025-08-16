@@ -1,4 +1,4 @@
-import { useRoom } from "../contexts/RoomContext";
+import {useRoom} from "../contexts/RoomContext";
 import {Debug} from "./debug";
 import {Votes} from "./votes";
 
@@ -14,15 +14,33 @@ export function Room() {
 
   return (
     <div className="app">
-      <h2>Room: {roomId}</h2>
-      <h4>Viewers:</h4>
+      <div className="room-header">
+        <h2>Room: {roomId}</h2>
+        <button className="leave-button" onClick={isViewer ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
+      </div>
+
+      <Votes/>
+      {!isViewer && (
+
+          <div className="vote-buttons">
+            {[1, 2, 3, 5, 8, 13].map((v) => (
+              <button key={v} onClick={() => vote(v)}>
+                {v}
+              </button>
+            ))}
+          </div>
+
+      )}
+
+      <h3>Current Ticket: {room.currentTicket || "None"}</h3>
+
+      <p>Viewers:</p>
       <ul>
         {room && room.viewers && Object.values(room.viewers)
           .map((user, idx) => (
             <li key={idx}>{user.name}</li>
           ))}
       </ul>
-      <h3>Current Ticket: {room.currentTicket || "None"}</h3>
 
       {isViewer && (
         <div className="dealer-controls">
@@ -37,20 +55,7 @@ export function Room() {
         </div>
       )}
 
-      {!isViewer && (
-        <div className="vote-buttons">
-          {[1, 2, 3, 5, 8, 13].map((v) => (
-            <button key={v} onClick={() => vote(v)}>
-              {v}
-            </button>
-          ))}
-          <div>
-            <button onClick={leaveRoomVoter}>Leave Room</button>
-          </div>
-        </div>
-      )}
 
-      <Votes/>
       <Debug/>
     </div>
   );

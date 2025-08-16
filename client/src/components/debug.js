@@ -6,7 +6,7 @@ export function Debug() {
    } = useRoom();
 
   return (
-    <div>
+    <div className="debug">
       <br/><br/>
       <p>Current Room</p>
       <pre>{JSON.stringify(room, null, 4)}</pre>
