@@ -1,126 +1,15 @@
-import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import "./App.css";
-
-const socket = io("http://localhost:4000");
+import { useRoom } from "./RoomContext";
 
 function App() {
-  const [room, setRoom] = useState(null);
-  const [availableRooms, setAvailableRooms] = useState([]);
-  const [name, setName] = useState("");
-  const [roomId, setRoomId] = useState("");
-  const [ticket, setTicket] = useState("");
-
-  function getRoomList() {
-    fetch("http://localhost:4000/rooms")
-      .then(res => res.json())
-      .then(data => {
-        setAvailableRooms(data);
-      })
-      .catch(err => console.error("Error fetching rooms:", err));
-  }
-
-  useEffect(() => {
-    getRoomList();
-  }, []);
-
-  useEffect(() => {
-    socket.on("roomUpdate", (data) => setRoom(data));
-    return () => socket.off("roomUpdate");
-  }, []);
-
-  useEffect(() => {
-    const handleVotesUpdate = (data) => setRoom(prev => ({ ...prev, votes: data }));
-    socket.on("votesUpdate", handleVotesUpdate);
-    return () => socket.off("votesUpdate", handleVotesUpdate);
-  }, []);
-
-  useEffect(() => {
-    const handleViewerUpdate = (data) => setRoom(prev => ({ ...prev, viewers: data }));
-    socket.on("viewerUpdate", handleViewerUpdate);
-    return () => socket.off("viewerUpdate", handleViewerUpdate);
-  }, []);
-
-  useEffect(() => {
-    const handleVoterUpdate = (data) => setRoom(prev => ({ ...prev, voters: data }));
-    socket.on("voterUpdate", handleVoterUpdate);
-    return () => socket.off("voterUpdate", handleVoterUpdate);
-  }, []);
-
-  useEffect(() => {
-    const logEvent = (event, ...args) => console.log("Socket event received:", event, args);
-    socket.onAny(logEvent);
-
-    return () => socket.offAny(logEvent);
-  }, []);
-
-  const createRoom = () => {
-    if (!roomId || !name) return alert("Enter name & room ID");
-    socket.emit("createRoom", { roomId, name: name });
-  };
-
-  const clearRooms = () => {
-    socket.emit("clearRooms");
-  };
-
-  const joinRoom = (roomIdToJoin) => {
-    if (!roomIdToJoin || !name) return alert("Enter name");
-
-    // Save locally
-    // localStorage.setItem("username", name);
-    // localStorage.setItem("roomId", roomIdToJoin);
-
-    socket.emit("joinRoom", { roomId: roomIdToJoin, name: name });
-    setRoomId(roomIdToJoin);
-  };
-
-  const openRoom = async (roomIdToJoin) => {
-    if (!roomIdToJoin || !name) return alert("Enter name");
-
-    // localStorage.setItem("roomId", roomIdToJoin);
-    socket.emit("openRoom", { roomId: roomIdToJoin, name: name});
-    setRoomId(roomIdToJoin);
-  };
-
-  const leaveRoomVoter = () => {
-    socket.emit("leaveRoomVoter", { roomId });
-    setRoom(null);
-    setRoomId("");
-    // localStorage.removeItem("roomId");
-  };
-
-  const leaveRoomViewer = () => {
-    socket.emit("leaveRoomViewer", { roomId });
-    setRoom(null);
-    setRoomId("");
-    // localStorage.removeItem("roomId");
-  };
-
-  // useEffect(() => {
-  //   const savedName = localStorage.getItem("username");
-  //   const savedRoom = localStorage.getItem("roomId");
-  //
-  //   if (savedName && savedRoom) {
-  //     setName(savedName);
-  //     setRoomId(savedRoom);
-  //     socket.emit("joinRoom", { roomId: savedRoom, name: savedName });
-  //   }
-  // }, []);
-
-  // Dealer actions
-  const setCurrentTicket = () => {
-    if (!ticket) return alert("Enter a ticket");
-    socket.emit("setTicket", { roomId, ticket });
-  };
-
-  const resetVotes = () => {
-    socket.emit("resetVotes", { roomId });
-  };
-
-  // Player actions
-  const vote = (value) => {
-    socket.emit("vote", { roomId, vote: value });
-  };
+  const {
+    room, availableRooms, name, setName,
+    roomId, setRoomId, ticket, setTicket,
+    createRoom, clearRooms, getRoomList, joinRoom, openRoom,
+    leaveRoomVoter, leaveRoomViewer, setCurrentTicket,
+    resetVotes, vote, socket
+  } = useRoom();
 
   if (!room) {
     return (
