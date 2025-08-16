@@ -19,8 +19,26 @@ function App() {
   }, []);
 
   useEffect(() => {
-    socket.on("roomUpdate", (data) => setRoom(data)); // sets full room object
+    socket.on("roomUpdate", (data) => setRoom(data));
     return () => socket.off("roomUpdate");
+  }, []);
+
+  useEffect(() => {
+    const handleVotesUpdate = (data) => setRoom(prev => ({ ...prev, votes: data }));
+    socket.on("votesUpdate", handleVotesUpdate);
+    return () => socket.off("votesUpdate", handleVotesUpdate);
+  }, []);
+
+  useEffect(() => {
+    const handleViewerUpdate = (data) => setRoom(prev => ({ ...prev, viewers: data }));
+    socket.on("viewerUpdate", handleViewerUpdate);
+    return () => socket.off("viewerUpdate", handleViewerUpdate);
+  }, []);
+
+  useEffect(() => {
+    const handleVoterUpdate = (data) => setRoom(prev => ({ ...prev, voters: data }));
+    socket.on("voterUpdate", handleVoterUpdate);
+    return () => socket.off("voterUpdate", handleVoterUpdate);
   }, []);
 
   useEffect(() => {
@@ -30,26 +48,24 @@ function App() {
     return () => socket.offAny(logEvent);
   }, []);
 
-  // Auth / Room join
   const createRoom = () => {
     if (!roomId || !name) return alert("Enter name & room ID");
     socket.emit("createRoom", { roomId, name: name });
   };
 
-  // Auth / Room join
   const clearRooms = () => {
-    socket.emit("clearRooms", {});
+    socket.emit("clearRooms");
   };
 
   const joinRoom = (roomIdToJoin) => {
     if (!roomIdToJoin || !name) return alert("Enter name");
 
     // Save locally
-    localStorage.setItem("username", name);
+    // localStorage.setItem("username", name);
     // localStorage.setItem("roomId", roomIdToJoin);
 
     socket.emit("joinRoom", { roomId: roomIdToJoin, name: name });
-    setRoomId(roomIdToJoin); // <-- store roomId for voting
+    setRoomId(roomIdToJoin);
   };
 
   const openRoom = async (roomIdToJoin) => {
@@ -57,10 +73,18 @@ function App() {
 
     // localStorage.setItem("roomId", roomIdToJoin);
     socket.emit("openRoom", { roomId: roomIdToJoin, name: name});
+    setRoomId(roomIdToJoin);
   };
 
-  const leaveRoom = () => {
-    socket.emit("leaveRoom", { roomId });
+  const leaveRoomVoter = () => {
+    socket.emit("leaveRoomVoter", { roomId });
+    setRoom(null);
+    setRoomId("");
+    // localStorage.removeItem("roomId");
+  };
+
+  const leaveRoomViewer = () => {
+    socket.emit("leaveRoomViewer", { roomId });
     setRoom(null);
     setRoomId("");
     // localStorage.removeItem("roomId");
@@ -124,6 +148,12 @@ function App() {
             </li>
           ))}
         </ul>
+        <div>
+          <h2>Current Room</h2>
+          <pre>{JSON.stringify(room, null, 4)}</pre>
+          <h2>Available Rooms</h2>
+          <pre>{JSON.stringify(availableRooms, null, 4)}</pre>
+        </div>
       </div>
     );
   }
@@ -151,7 +181,7 @@ function App() {
           />
           <button onClick={setCurrentTicket}>Set Ticket</button>
           <button onClick={resetVotes}>Reset Votes</button>
-          <button onClick={leaveRoom}>Leave Room</button>
+          <button onClick={leaveRoomViewer}>Leave Room</button>
         </div>
       )}
 
@@ -163,7 +193,7 @@ function App() {
             </button>
           ))}
           <div>
-            <button onClick={leaveRoom}>Leave Room</button>
+            <button onClick={leaveRoomVoter}>Leave Room</button>
           </div>
         </div>
       )}
@@ -172,6 +202,7 @@ function App() {
       <div className="cards">
         {room && room.voters && Object.entries(room.voters)
           .map(([id, voter]) => {
+            if (!room) return;
             const voteValue = room.votes[id];
             const show = room.showVotes || id === socket.id;
             return (
@@ -187,6 +218,13 @@ function App() {
               </div>
             );
           })}
+      </div>
+
+      <div>
+        <h2>Current Room</h2>
+        <pre>{JSON.stringify(room, null, 4)}</pre>
+        <h2>Available Rooms</h2>
+        <pre>{JSON.stringify(availableRooms, null, 4)}</pre>
       </div>
     </div>
   );

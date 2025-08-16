@@ -5,7 +5,7 @@ const getHandlers = require("./socketHandlers");
 
 const cors = require("cors");
 
-const storage = require("node-persist");
+// const storage = require("node-persist");
 
 const app = express();
 app.use(cors());
@@ -22,11 +22,13 @@ let rooms = {};
 let handlers;
 
 async function saveRooms() {
-  await storage.setItem(ROOMS_KEY, rooms);
+  // await storage.setItem(ROOMS_KEY, rooms);
 }
 
 function broadcastRooms() {
-  if (!rooms) return;
+  if (!rooms) {
+    io.emit("roomsList", []);
+  };
   const roomList = Object.keys(rooms).map(roomId => ({
     id: roomId,
     playerCount: Object.values(rooms[roomId].voters).length
@@ -46,16 +48,19 @@ io.on("connection", (socket) => {
   socket.on("resetVotes", (data) => handlers.resetVotes(data));
   socket.on("disconnect", () => handlers.disconnect(socket));
   socket.on("clearRooms", () => { console.log("Clearing Rooms"); rooms = {}; saveRooms(); broadcastRooms(); });
-  socket.on("leaveRoom", (data) => handlers.leaveRoom(socket, data));
+  socket.on("leaveRoomViewer", (data) => handlers.leaveRoomViewer(socket, data));
+  socket.on("leaveRoomVoter", (data) => handlers.leaveRoomVoter(socket, data));
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));
 });
 
-// ---------- Initialize storage ----------
-(async () => {
-  await storage.init({ dir: "./tmp-storage", stringify: JSON.stringify });
-  rooms = (await storage.getItem(ROOMS_KEY)) || {};
-  console.log("Loaded rooms from storage:", rooms);
-  handlers = getHandlers(io, rooms, saveRooms, broadcastRooms);
-})();
+// // ---------- Initialize storage ----------
+// (async () => {
+//   await storage.init({ dir: "./tmp-storage", stringify: JSON.stringify });
+//   rooms = (await storage.getItem(ROOMS_KEY)) || {};
+//   console.log("Loaded rooms from storage:", rooms);
+//   handlers = getHandlers(io, rooms, saveRooms, broadcastRooms);
+// })();
+
+handlers = getHandlers(io, rooms, saveRooms, broadcastRooms);
 
 server.listen(4000, "0.0.0.0", () => console.log("Server running on port 4000"));
