@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import "./App.css";
 
-const socket = io("http://localhost:4000"); // Adjust if server is on another host/port
+const socket = io("http://localhost:4000");
 
 function App() {
   const [room, setRoom] = useState(null);
@@ -46,7 +46,7 @@ function App() {
 
     // Save locally
     localStorage.setItem("username", name);
-    localStorage.setItem("roomId", roomIdToJoin);
+    // localStorage.setItem("roomId", roomIdToJoin);
 
     socket.emit("joinRoom", { roomId: roomIdToJoin, name: name });
     setRoomId(roomIdToJoin); // <-- store roomId for voting
@@ -55,7 +55,7 @@ function App() {
   const openRoom = async (roomIdToJoin) => {
     if (!roomIdToJoin || !name) return alert("Enter name");
 
-    localStorage.setItem("roomId", roomIdToJoin);
+    // localStorage.setItem("roomId", roomIdToJoin);
     socket.emit("openRoom", { roomId: roomIdToJoin, name: name});
   };
 
@@ -63,19 +63,19 @@ function App() {
     socket.emit("leaveRoom", { roomId });
     setRoom(null);
     setRoomId("");
-    localStorage.removeItem("roomId");
+    // localStorage.removeItem("roomId");
   };
 
-  useEffect(() => {
-    const savedName = localStorage.getItem("username");
-    const savedRoom = localStorage.getItem("roomId");
-
-    if (savedName && savedRoom) {
-      setName(savedName);
-      setRoomId(savedRoom);
-      socket.emit("joinRoom", { roomId: savedRoom, name: savedName });
-    }
-  }, []);
+  // useEffect(() => {
+  //   const savedName = localStorage.getItem("username");
+  //   const savedRoom = localStorage.getItem("roomId");
+  //
+  //   if (savedName && savedRoom) {
+  //     setName(savedName);
+  //     setRoomId(savedRoom);
+  //     socket.emit("joinRoom", { roomId: savedRoom, name: savedName });
+  //   }
+  // }, []);
 
   // Dealer actions
   const setCurrentTicket = () => {

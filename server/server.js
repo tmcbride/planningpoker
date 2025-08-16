@@ -48,8 +48,6 @@ io.on("connection", (socket) => {
   socket.on("clearRooms", () => { console.log("Clearing Rooms"); rooms = {}; saveRooms(); broadcastRooms(); });
   socket.on("leaveRoom", (data) => handlers.leaveRoom(socket, data));
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));
-
-  broadcastRooms();
 });
 
 // ---------- Initialize storage ----------

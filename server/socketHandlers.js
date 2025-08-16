@@ -1,17 +1,25 @@
 
-async function removeUserFromRoom(rooms, roomId, socket, saveRooms) {
-  if (!rooms) return;
+async function
+removeUserFromRoom(rooms, roomId, socket) {
+  if (!rooms || !rooms[roomId]) return false;
+
+  let found = false;
   const r = rooms[roomId];
-  if (r && r.voters && r.voters[socket.id]) {
+  if (r.voters && r.voters[socket.id]) {
+    console.log("Removign voter:", socket.id, "from room:", roomId);
+
     delete r.voters[socket.id];
     delete r.votes[socket.id];
+    found = true;
   }
 
-  if (r && r.viewers && r.viewers[socket.id]) {
+  if (r.viewers && r.viewers[socket.id]) {
+    console.log("Removign viewer:", socket.id, "from room:", roomId);
     delete r.viewers[socket.id];
+    found = true;
   }
 
-  await saveRooms();
+  return found;
 }
 
 module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
@@ -21,6 +29,7 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
 
     socket.join(roomId);
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
+    console.log(rooms);
     broadcastRooms();
   },
 
@@ -88,8 +97,13 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
     socket.emit("roomsList", roomList);
   },
 
-  leaveRoom: (socket, { roomId }) => {
-    removeUserFromRoom(rooms, roomId, socket, saveRooms);
+  leaveRoom: async (socket, { roomId }) => {
+    let found = removeUserFromRoom(rooms, roomId, socket, saveRooms);
+    if (found) {
+    await saveRooms();
+    socket.leave(roomId);
+    io.to(roomId).emit("roomUpdate", rooms[roomId]);
+  }
   },
 
   resetVotes:  async ({ roomId }) => {
@@ -104,11 +118,9 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
 // When a player leaves
 disconnect:  async (socket) => {
   for (const roomId of Object.keys(rooms)) {
-    const r = rooms[roomId];
-    if (r && r.voters && r.voters[socket.id]) {
-      delete r.voters[socket.id];
-      delete r.viewers[socket.id];
-      delete r.votes[socket.id];
+    let found = removeUserFromRoom(rooms, roomId, socket);
+
+    if (found) {
       await saveRooms();
       broadcastRooms();
       io.to(roomId).emit("roomUpdate", rooms[roomId]);
