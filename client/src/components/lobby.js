@@ -3,36 +3,31 @@ import {Debug} from "./debug";
 
 export function Lobby() {
   const {
-    availableRooms,
-    roomId, setRoomId,
-    createRoom, clearRooms, getRoomList, joinRoom, openRoom
+    availableRooms, clearRooms, getRoomList, joinRoom, openRoom
   } = useRoom();
 
   return (
     <div className="lobby">
-      <div>
-        <input
-          placeholder="Room ID"
-          value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
-        />
-        <button onClick={createRoom}>Create Room</button>
-        <button onClick={clearRooms}>Clear Rooms</button>
-      </div>
 
       <div className="roomList">
-        <strong>Rooms</strong>
-        <button onClick={getRoomList} style={{ marginLeft: "1rem"}}>Refresh</button>
-        <div>
-          {availableRooms.length === 0 && <li>No rooms available</li>}
+          <div className="room-header">
+            <h2>Rooms</h2>
+            <button className="leave-button" onClick={clearRooms}>Clear Rooms</button>
+            <button onClick={getRoomList}>Refresh</button>
+          </div>
+        <div className="roomRow">
+
+        {availableRooms.length === 0 && <div>No rooms available</div>}
           {availableRooms.map(room => (
-            <div className="roomRow">
-              <button onClick={() => openRoom(room.id)}>Open</button>
-              <button onClick={() => joinRoom(room.id)}>Join</button>
-
-              -
-
-              {room.id} ({room.playerCount} players)
+            <div className="roomRow" key={room.id}>
+              <div className="room-info">
+                <strong>{room.id}</strong>
+                <span className="player-count">{room.playerCount} players</span>
+              </div>
+              <div className="room-actions">
+                <button onClick={() => openRoom(room.id)}>Open</button>
+                <button onClick={() => joinRoom(room.id)}>Join</button>
+              </div>
             </div>
           ))}
         </div>

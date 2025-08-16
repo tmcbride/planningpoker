@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="App-header">
       <h1>Planning Poker</h1>
-      <NameInput/>
+      {!room && (<NameInput/> )}
       {element}
     </div>
 );

@@ -19,7 +19,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /*justify-content: center;*/
   font-size: calc(10px + 1vmin);
 }
 
@@ -43,7 +43,7 @@
 }
 
 .lobby {
-  padding: 2rem;
+  padding: 0 2rem;
   min-width: 900px;
 }
 
@@ -55,6 +55,7 @@
   display: flex;
   flex-direction: row;
   width: 100%;
+  margin-bottom: 2rem;
 }
 
 .leave-button {
@@ -178,6 +179,7 @@ h2 {
   font-size: 20px;
   overflow-y: scroll;
   border: 1px solid black;
+  visibility: hidden;
 }
 
 input {
@@ -191,7 +193,7 @@ input {
   transition: all 0.2s ease-in-out;
   outline: none;
   box-sizing: border-box;
-  margin-right: 0.5rem;
+  margin: 0.5rem;
 }
 
 input:focus {
@@ -210,9 +212,41 @@ input:disabled {
 }
 
 .roomList {
+  border: 3px solid #9b9b9b;
+  padding: 15px 20px 20px 20px;
   margin: 2rem;
+  border-radius: 5px;
+  background-color: #ffffff;
 }
 
 .roomRow {
-  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f9f9f9;
+}
+
+.room-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-count {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.room-actions button {
+  margin-left: 0.5rem;
+}
+
+.name-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;   /* vertically align within row */
+  gap: 0.5rem;           /* consistent spacing */
 }

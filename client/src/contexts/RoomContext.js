@@ -8,7 +8,7 @@ export const useRoom = () => useContext(RoomContext);
 export function RoomProvider({children}) {
   const [room, setRoom] = useState(null);
   const [availableRooms, setAvailableRooms] = useState([]);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(localStorage.getItem("name"));
   const [roomId, setRoomId] = useState("");
   const [ticket, setTicket] = useState("");
 
@@ -34,6 +34,10 @@ export function RoomProvider({children}) {
   }
 
   useEffect(() => {
+    localStorage.setItem("name", name);
+  }, [name]);
+
+  useEffect(() => {
     getRoomList();
   }, []);
 
@@ -42,6 +46,12 @@ export function RoomProvider({children}) {
     socket.on("roomUpdate", handleRoomUpdate);
     return () => socket.off("roomUpdate", handleRoomUpdate);
   }, [socket]);
+
+  // useEffect(() => {
+  //   const handleRoomUpdate = (data) => setAvailableRooms(data);
+  //   socket.on("roomsList", handleRoomUpdate);
+  //   return () => socket.off("roomsList", handleRoomUpdate);
+  // }, [socket]);
 
   useEffect(() => {
     const handleVotesUpdate = (data) => setRoom(prev => prev ? ({ ...prev, votes: data.votes, showVotes: data.showVotes }) : prev);
