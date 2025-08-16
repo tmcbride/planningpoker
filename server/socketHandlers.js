@@ -1,4 +1,4 @@
-async function removeUserFromRoom(rooms, roomId, socket) {
+async function removeUserFromRoom(rooms, roomId, socket, saveRooms) {
   if (!rooms) return;
   const r = rooms[roomId];
   if (r.users[socket.id]) {
@@ -71,7 +71,7 @@ module.exports = (io, rooms, saveRooms, broadcastRooms) => ({
   },
 
   leaveRoom: (socket, { roomId }) => {
-    removeUserFromRoom(rooms, roomId, socket);
+    removeUserFromRoom(rooms, roomId, socket, saveRooms);
   },
 
   resetVotes:  async ({ roomId }) => {

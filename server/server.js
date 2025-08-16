@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
   socket.on("resetVotes", (data) => handlers.resetVotes(data));
   socket.on("disconnect", () => handlers.disconnect(socket));
   socket.on("clearRooms", () => { console.log("Clearing Rooms"); rooms = {}; broadcastRooms(); });
-  socket.on("leaveRoom", () => handlers.leaveRoom(socket));
+  socket.on("leaveRoom", (data) => handlers.leaveRoom(socket, data));
 
   broadcastRooms();
 });
