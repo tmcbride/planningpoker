@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
-import "./App.css"; // We'll add a bit of styling here
+import "./App.css";
 
 const socket = io("http://localhost:4000"); // Adjust if server is on another host/port
 
@@ -13,13 +13,6 @@ function App() {
 
   useEffect(() => {
     socket.on("roomsList", setAvailableRooms);
-    return () => socket.off("roomsList");
-  }, []);
-
-  useEffect(() => {
-    socket.on("roomsList", setAvailableRooms);
-
-    // Ask server immediately on page load
     socket.emit("requestRooms");
 
     return () => socket.off("roomsList");
@@ -43,6 +36,11 @@ function App() {
     socket.emit("createRoom", { roomId, dealer: name });
   };
 
+  // Auth / Room join
+  const clearRooms = () => {
+    socket.emit("clearRooms", {});
+  };
+
   const joinRoom = (roomIdToJoin) => {
     if (!roomIdToJoin || !name) return alert("Enter name");
 
@@ -52,6 +50,13 @@ function App() {
 
     socket.emit("joinRoom", { roomId: roomIdToJoin, name });
     setRoomId(roomIdToJoin); // <-- store roomId for voting
+  };
+
+  const leaveRoom = () => {
+    socket.emit("leaveRoom", { roomId });
+    setRoom(null);
+    setRoomId("");
+    localStorage.removeItem("roomId");
   };
 
   useEffect(() => {
@@ -103,6 +108,7 @@ function App() {
         />
         <div>
           <button onClick={createRoom}>Create Room</button>
+          <button onClick={clearRooms}>Clear Rooms</button>
         </div>
 
         <ul>
@@ -146,6 +152,9 @@ function App() {
               {v}
             </button>
           ))}
+          <div>
+            <button onClick={leaveRoom}>Leave Room</button>
+          </div>
         </div>
       )}
 
