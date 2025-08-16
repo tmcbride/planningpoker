@@ -28,6 +28,15 @@ function removeViewerFromRoom(rooms, roomId, socket) {
   return found;
 }
 
+function refreshRooms(rooms, io) {
+  const roomList = Object.keys(rooms).map(roomId => ({
+    id: roomId,
+    playerCount: Object.values(rooms[roomId].voters).length
+  }));
+  console.log("Sending Rooms: ", roomList);
+  io.emit("roomsList", roomList);
+}
+
 module.exports = (io, rooms, saveRooms) => ({
   createRoom: async (socket, {roomId, name}) => {
     rooms[roomId] = {viewers: {}, voters: {}, votes: {}, showVotes: false};
@@ -36,6 +45,7 @@ module.exports = (io, rooms, saveRooms) => ({
     socket.join(roomId);
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
     console.log(rooms);
+    refreshRooms(rooms, io);
   },
 
   joinRoom: async (socket, {roomId, name}) => {
@@ -94,12 +104,8 @@ module.exports = (io, rooms, saveRooms) => ({
     io.to(roomId).emit("votesUpdate", { votes: room.votes, showVotes: room.showVotes});
   },
 
-  requestRooms: (socket) => {
-    const roomList = Object.keys(rooms).map(roomId => ({
-      id: roomId,
-      playerCount: Object.values(rooms[roomId].voters).length
-    }));
-    socket.emit("roomsList", roomList);
+  requestRooms: (io) => {
+    refreshRooms(rooms, io);
   },
 
   leaveRoomVoter: async (socket, {roomId}) => {

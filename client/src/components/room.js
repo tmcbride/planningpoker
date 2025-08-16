@@ -51,7 +51,6 @@ export function Room() {
           />
           <button onClick={setCurrentTicket}>Set Ticket</button>
           <button onClick={resetVotes}>Reset Votes</button>
-          <button onClick={leaveRoomViewer}>Leave Room</button>
         </div>
       )}
 

@@ -47,11 +47,14 @@ export function RoomProvider({children}) {
     return () => socket.off("roomUpdate", handleRoomUpdate);
   }, [socket]);
 
-  // useEffect(() => {
-  //   const handleRoomUpdate = (data) => setAvailableRooms(data);
-  //   socket.on("roomsList", handleRoomUpdate);
-  //   return () => socket.off("roomsList", handleRoomUpdate);
-  // }, [socket]);
+  useEffect(() => {
+    const handleRoomUpdate = (data) => {
+      console.log("Recieved: ", data);
+      setAvailableRooms(data);
+    }
+    socket.on("roomsList", handleRoomUpdate);
+    return () => socket.off("roomsList", handleRoomUpdate);
+  }, [socket]);
 
   useEffect(() => {
     const handleVotesUpdate = (data) => setRoom(prev => prev ? ({ ...prev, votes: data.votes, showVotes: data.showVotes }) : prev);

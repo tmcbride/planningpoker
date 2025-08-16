@@ -25,6 +25,13 @@ async function saveRooms() {
   // await storage.setItem(ROOMS_KEY, rooms);
 }
 
+async function clearRooms() {
+  console.log("Clearing Rooms");
+  for (const key in rooms) delete rooms[key]; // clear in-place
+  await saveRooms();
+  handlers.requestRooms(io);
+}
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
@@ -32,10 +39,10 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", (data) => handlers.joinRoom(socket, data));
   socket.on("setTicket", (data) => handlers.setTicket(data));
   socket.on("vote", (data) => handlers.vote(socket, data));
-  socket.on("requestRooms", () => handlers.requestRooms(socket));
+  socket.on("requestRooms", () => handlers.requestRooms(io));
   socket.on("resetVotes", (data) => handlers.resetVotes(data));
   socket.on("disconnect", () => handlers.disconnect(socket));
-  socket.on("clearRooms", async () => { console.log("Clearing Rooms"); rooms = {}; await saveRooms(); await handlers.requestRooms(socket)});
+  socket.on("clearRooms", () => clearRooms());
   socket.on("leaveRoomViewer", (data) => handlers.leaveRoomViewer(socket, data));
   socket.on("leaveRoomVoter", (data) => handlers.leaveRoomVoter(socket, data));
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));
