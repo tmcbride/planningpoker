@@ -7,24 +7,31 @@ export function Votes() {
 
   return (
     <div>
-
-      <h3>Players’ Hands</h3>
       <div className="cards">
         {room && room.voters && Object.entries(room.voters)
           .map(([id, voter]) => {
             if (!room) return;
             const voteValue = room.votes[id];
-            const show = room.showVotes || id === getUserId();
+            const show = room.showVotes || (id === getUserId() && voteValue !== undefined);
             return (
-              <div key={id} className="card">
-                <div className="card-name">{voter.name}</div>
-                <div className="card-value">
-                  {show
-                    ? voteValue ?? "—"
-                    : voteValue !== undefined
+              <div>
+                <div className={`flip-card ${show ? "flipped" : ""}`}>
+                  <div className="flip-card-inner">
+                    <div className="flip-card-front">
+                      {voteValue !== undefined
                       ? "✅"
-                      : "—"}
+                      : ""}
+                    </div>
+                    <div className="flip-card-back">
+                            {show
+                              ? voteValue ?? ""
+                              : voteValue !== undefined
+                                ? "✅"
+                                : ""}
+                    </div>
+                  </div>
                 </div>
+                <div className="card-name">{voter.name}</div>
               </div>
             );
           })}

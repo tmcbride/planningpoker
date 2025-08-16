@@ -91,7 +91,7 @@ module.exports = (io, rooms, saveRooms) => ({
       room.showVotes = true;
     }
     await saveRooms();
-    io.to(roomId).emit("votesUpdate", rooms[roomId].votes);
+    io.to(roomId).emit("votesUpdate", { votes: room.votes, showVotes: room.showVotes});
   },
 
   requestRooms: (socket) => {

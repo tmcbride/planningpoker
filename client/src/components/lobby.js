@@ -10,7 +10,6 @@ export function Lobby() {
 
   return (
     <div className="login">
-      <h1>Planning Poker</h1>
       <input
         placeholder="Your name"
         value={name}

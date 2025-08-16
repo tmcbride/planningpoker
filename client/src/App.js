@@ -5,7 +5,13 @@ import { Room } from "./components/room";
 
 function App() {
   const {room} = useRoom();
-  return room ? <Room /> : <Lobby />;
+  let element = room ? <Room /> : <Lobby />;
+  return (
+    <div className="App-header">
+      <h1>Planning Poker</h1>
+      {element}
+    </div>
+);
 }
 
 export default App;
