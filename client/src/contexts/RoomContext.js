@@ -12,7 +12,6 @@ export function RoomProvider({children}) {
   const [roomId, setRoomId] = useState("");
   const [ticket, setTicket] = useState("");
 
-
   const socketRef = useRef(null);
 
   if (!socketRef.current) {
@@ -30,6 +29,10 @@ export function RoomProvider({children}) {
       .catch(err => console.error("Error fetching rooms:", err));
   }
 
+  function getUserId() {
+    return socket.id;
+  }
+
   useEffect(() => {
     getRoomList();
   }, []);
@@ -38,32 +41,32 @@ export function RoomProvider({children}) {
     const handleRoomUpdate = (data) => setRoom(data);
     socket.on("roomUpdate", handleRoomUpdate);
     return () => socket.off("roomUpdate", handleRoomUpdate);
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     const handleVotesUpdate = (data) => setRoom(prev => prev ? ({ ...prev, votes: data }) : prev);
     socket.on("votesUpdate", handleVotesUpdate);
     return () => socket.off("votesUpdate", handleVotesUpdate);
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     const handleViewerUpdate = (data) => setRoom(prev => prev ? ({ ...prev, viewers: data }) : prev);
     socket.on("viewerUpdate", handleViewerUpdate);
     return () => socket.off("viewerUpdate", handleViewerUpdate);
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     const handleVoterUpdate = (data) => setRoom(prev => prev ? ({ ...prev, voters: data }) : prev);
     socket.on("voterUpdate", handleVoterUpdate);
     return () => socket.off("voterUpdate", handleVoterUpdate);
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     const logEvent = (event, ...args) => console.log("Socket event received:", event, args);
     socket.onAny(logEvent);
 
     return () => socket.offAny(logEvent);
-  }, []);
+  }, [socket]);
 
   const createRoom = () => {
     if (!roomId || !name) return alert("Enter name & room ID");
@@ -154,7 +157,7 @@ export function RoomProvider({children}) {
         setCurrentTicket,
         resetVotes,
         vote,
-        socket
+        getUserId
       }}
     >
       {children}
