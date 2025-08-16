@@ -221,6 +221,7 @@ input:disabled {
 
 .roomRow {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
@@ -228,16 +229,31 @@ input:disabled {
   border: 1px solid #ddd;
   border-radius: 6px;
   background: #f9f9f9;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.roomEntry {
+  display: flex;
+  flex-direction: row;
 }
 
 .room-info {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .player-count {
   font-size: 0.85rem;
   color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.room-actions {
+  margin-left: 0.5rem;
 }
 
 .room-actions button {
