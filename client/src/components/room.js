@@ -1,7 +1,6 @@
 import {useRoom} from "../contexts/RoomContext";
 import {Debug} from "./debug";
 import {Votes} from "./votes";
-import {Viewers} from "./viewers";
 
 export function Room() {
   const {
@@ -65,7 +64,6 @@ export function Room() {
         )}
       </div>
 
-      <Viewers/>
       <Debug/>
     </div>
   );

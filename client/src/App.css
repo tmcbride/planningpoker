@@ -24,9 +24,9 @@
 
 .App-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  /*justify-content: center;*/
   padding: 2rem;
   background: linear-gradient(90deg, #4e8cff, #1c60d6);
   color: white;
@@ -335,11 +335,25 @@ input:disabled {
   color: #333;
 }
 
+.viewer-container {
+  margin-left: auto;
+  float: right;
+  background-color: white;
+  color: black;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 1.5rem;
+  border-radius: 15px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .viewers {
   list-style-type: none;
   display: flex;
   flex-direction: row;
   justify-content: center;
+  padding: 0;
 }
 
 .viewer {

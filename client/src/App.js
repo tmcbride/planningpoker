@@ -3,6 +3,7 @@ import { useRoom } from "./contexts/RoomContext";
 import { Lobby } from "./components/lobby";
 import { Room } from "./components/room";
 import {NameInput} from "./components/nameInput";
+import {Viewers} from "./components/viewers";
 
 function App() {
   const {room} = useRoom();
@@ -11,6 +12,7 @@ function App() {
     <div className="App">
       <div className="App-header">
         <h1>Planning Poker</h1>
+        <Viewers/>
       </div>
       <div className="App-content">
         {!room && (<NameInput/> )}

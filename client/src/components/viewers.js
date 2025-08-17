@@ -5,6 +5,10 @@ export function Viewers() {
     room, getUserId, makeMeDealer
   } = useRoom();
 
+  if (!room) {
+    return null;
+  }
+
   const isDealer = isUserDealer(getUserId());
   const isViewer = !!room?.viewers?.[getUserId()];
 
@@ -13,7 +17,7 @@ export function Viewers() {
   }
 
   return (
-    <div>
+    <div className="viewer-container">
     {isViewer && !isDealer && (
       <button onClick={makeMeDealer}>Make Me Dealer</button>
     )}
