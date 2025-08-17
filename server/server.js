@@ -79,6 +79,24 @@ app.get("/tickets/:projectId", (req, res) => {
   });
 });
 
+app.get("/projects", (req, res) => {
+  fs.readFile(file, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading JSON file:', err);
+      return;
+    }
+
+    try {
+      const jsonData = JSON.parse(data);
+      console.log('Parsed JSON data:', jsonData);
+      let resp = Object.keys(jsonData);
+      res.json(resp);
+    } catch (parseError) {
+      console.error('Error parsing JSON:', parseError);
+    }
+  });
+});
+
 // // ---------- Initialize storage ----------
 // (async () => {
 //   await storage.init({ dir: "./tmp-storage", stringify: JSON.stringify });

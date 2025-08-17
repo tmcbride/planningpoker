@@ -10,7 +10,7 @@ export function Votes() {
   useEffect(() => {
     if (room.showVotes) {
       const votes = Object.values(room.votes).filter(v => v !== undefined);
-      if (votes.length > 0) {
+      if (votes.length > 1) {
         const first = votes[0];
         if (votes.every(v => v === first)) {
           setShowFireworks(true);

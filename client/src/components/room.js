@@ -5,14 +5,12 @@ import {DealerControls} from "./dealerControls";
 
 export function Room() {
   const {
-    room, roomId,
-    leaveRoomVoter, leaveRoomViewer,
+    room,
     vote, getUserId
   } = useRoom();
 
   const isDealer = isUserDealer(getUserId());
   const isViewer = !!room?.viewers?.[getUserId()];
-  const dealer = room.dealer && room.viewers[room.dealer] ? room.viewers[room.dealer] : "";
 
   function isUserDealer(userId) {
     return room.dealer === userId;
@@ -20,18 +18,11 @@ export function Room() {
 
   return (
     <div className="room">
-
       {isDealer && (
         <DealerControls/>
       )}
 
       <div className="room-content">
-        <div className="room-header">
-          <h2>{roomId}</h2>
-          <p style={{marginLeft: "20px"}}>{dealer.name ? "Dealer - " + dealer.name : "No Dealer!!"}</p>
-          <button className="leave-button" onClick={isViewer ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
-        </div>
-
         <Votes/>
         {!isViewer && (
           <div className="vote-buttons">
