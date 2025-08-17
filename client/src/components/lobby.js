@@ -1,10 +1,35 @@
 import {useRoom} from "../contexts/RoomContext";
 import {Debug} from "./debug";
+import {useEffect, useState} from "react";
 
 export function Lobby() {
   const {
-    availableRooms, clearRooms, getRoomList, joinRoom, openRoom
+    socket, clearRooms, joinRoom, openRoom
   } = useRoom();
+
+  const [availableRooms, setAvailableRooms] = useState([]);
+
+  function getRoomList() {
+    fetch("http://localhost:4000/rooms")
+      .then(res => res.json())
+      .then(data => {
+        setAvailableRooms(data);
+      })
+      .catch(err => console.error("Error fetching rooms:", err));
+  }
+
+  useEffect(() => {
+    const handleRoomUpdate = (data) => {
+      console.log("Recieved: ", data);
+      setAvailableRooms(data);
+    }
+    socket.on("roomsList", handleRoomUpdate);
+    return () => socket.off("roomsList", handleRoomUpdate);
+  }, [socket]);
+
+  useEffect(() => {
+    getRoomList();
+  }, []);
 
   return (
     <div className="lobby">

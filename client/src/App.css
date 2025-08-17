@@ -6,9 +6,7 @@
   --text: #333;
 }
 
-
 .App {
-  /*text-align: center;*/
   display: flex;
   flex-direction: column;
 }
@@ -188,6 +186,7 @@ button {
   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   margin: 0.2rem 0.5rem 0 0;
   height: 3rem;
+  white-space: nowrap;
 }
 
 button:hover {
@@ -348,4 +347,53 @@ input:disabled {
 
 .viewer-icon {
   font-size: 3rem;
+}
+
+.firework {
+  position: absolute;
+  top: 25%;             /* center on screen or container */
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: transparent;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: explode 1.5s ease-out infinite;
+  z-index: 1000;
+}
+
+.firework::before,
+.firework::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow:
+          0 -60px var(--primary),
+          52px -30px var(--accent),
+          52px 30px var(--primary-dark),
+          0 60px var(--accent),
+          -52px 30px var(--primary),
+          -52px -30px var(--accent);
+}
+
+.firework::after {
+  transform: rotate(45deg);
+}
+
+@keyframes explode {
+  from {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.8);
+    opacity: 0;
+  }
 }

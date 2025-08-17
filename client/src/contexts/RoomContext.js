@@ -7,7 +7,6 @@ export const useRoom = () => useContext(RoomContext);
 
 export function RoomProvider({children}) {
   const [room, setRoom] = useState(null);
-  const [availableRooms, setAvailableRooms] = useState([]);
   const [name, setName] = useState(localStorage.getItem("name"));
   const [roomId, setRoomId] = useState("");
   const [ticket, setTicket] = useState("");
@@ -21,15 +20,6 @@ export function RoomProvider({children}) {
 
   const socket = socketRef.current;
 
-  function getRoomList() {
-    fetch("http://localhost:4000/rooms")
-      .then(res => res.json())
-      .then(data => {
-        setAvailableRooms(data);
-      })
-      .catch(err => console.error("Error fetching rooms:", err));
-  }
-
   function getUserId() {
     return socket.id;
   }
@@ -39,22 +29,9 @@ export function RoomProvider({children}) {
   }, [name]);
 
   useEffect(() => {
-    getRoomList();
-  }, []);
-
-  useEffect(() => {
     const handleRoomUpdate = (data) => setRoom(data);
     socket.on("roomUpdate", handleRoomUpdate);
     return () => socket.off("roomUpdate", handleRoomUpdate);
-  }, [socket]);
-
-  useEffect(() => {
-    const handleRoomUpdate = (data) => {
-      console.log("Recieved: ", data);
-      setAvailableRooms(data);
-    }
-    socket.on("roomsList", handleRoomUpdate);
-    return () => socket.off("roomsList", handleRoomUpdate);
   }, [socket]);
 
   useEffect(() => {
@@ -158,7 +135,6 @@ export function RoomProvider({children}) {
     <RoomContext.Provider
       value={{
         room,
-        availableRooms,
         name,
         setName,
         roomId,
@@ -167,7 +143,6 @@ export function RoomProvider({children}) {
         setTicket,
         ticketDetails,
         setTicketDetails,
-        getRoomList,
         createRoom,
         clearRooms,
         joinRoom,
@@ -178,7 +153,8 @@ export function RoomProvider({children}) {
         resetVotes,
         vote,
         getUserId,
-        makeMeDealer
+        makeMeDealer,
+        socket
       }}
     >
       {children}

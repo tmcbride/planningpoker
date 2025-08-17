@@ -1,12 +1,29 @@
 import {useRoom} from "../contexts/RoomContext";
+import {useEffect, useState} from "react";
 
 export function Votes() {
   const {
     room, getUserId
   } = useRoom();
+  const [showFireworks, setShowFireworks] = useState(false);
+
+  useEffect(() => {
+    if (room.showVotes) {
+      const votes = Object.values(room.votes).filter(v => v !== undefined);
+      if (votes.length > 0) {
+        const first = votes[0];
+        if (votes.every(v => v === first)) {
+          setShowFireworks(true);
+          const timer = setTimeout(() => setShowFireworks(false), 3000);
+          return () => clearTimeout(timer);
+        }
+      }
+    }
+  }, [room.showVotes, room.votes]);
 
   return (
     <div>
+      {showFireworks && <div className="firework"></div>}
       <div className="cards">
         {room && room.voters && Object.entries(room.voters)
           .map(([id, voter]) => {
