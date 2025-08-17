@@ -11,6 +11,7 @@ export function RoomProvider({children}) {
   const [name, setName] = useState(localStorage.getItem("name"));
   const [roomId, setRoomId] = useState("");
   const [ticket, setTicket] = useState("");
+  const [ticketDetails, setTicketDetails] = useState("");
 
   const socketRef = useRef(null);
 
@@ -137,7 +138,7 @@ export function RoomProvider({children}) {
   // Dealer actions
   const setCurrentTicket = () => {
     if (!ticket) return alert("Enter a ticket");
-    socket.emit("setTicket", { roomId, ticket });
+    socket.emit("setTicket", { roomId, ticket: { title: ticket, details: ticketDetails} });
   };
 
   const resetVotes = () => {
@@ -160,6 +161,8 @@ export function RoomProvider({children}) {
         setRoomId,
         ticket,
         setTicket,
+        ticketDetails,
+        setTicketDetails,
         getRoomList,
         createRoom,
         clearRooms,

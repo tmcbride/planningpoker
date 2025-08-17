@@ -5,7 +5,7 @@ import {Votes} from "./votes";
 export function Room() {
   const {
     room,
-    roomId, ticket, setTicket,
+    roomId, ticket, setTicket, ticketDetails, setTicketDetails,
     leaveRoomVoter, leaveRoomViewer, setCurrentTicket,
     resetVotes, vote, getUserId
   } = useRoom();
@@ -32,7 +32,33 @@ export function Room() {
 
       )}
 
-      <h3>Current Ticket: {room.currentTicket || "None"}</h3>
+      {isViewer && (
+        <div className="dealer-controls">
+          <input
+            placeholder="Ticket Title"
+            value={ticket}
+            onChange={(e) => setTicket(e.target.value)}
+          />
+          <input
+            placeholder="Ticket Description"
+            value={ticketDetails}
+            onChange={(e) => setTicketDetails(e.target.value)}
+          />
+          <button onClick={setCurrentTicket}>Set Ticket</button>
+          <button onClick={resetVotes}>Reset Votes</button>
+        </div>
+      )}
+
+      <div className="ticket-info">
+        {room.currentTicket ? (
+          <div className="ticket-card">
+            <h4>{room.currentTicket.title}</h4>
+            <p>{room.currentTicket.details}</p>
+          </div>
+        ) : (
+          <p>No ticket selected</p>
+        )}
+      </div>
 
       <p>Viewers:</p>
       <ul>
@@ -42,17 +68,7 @@ export function Room() {
           ))}
       </ul>
 
-      {isViewer && (
-        <div className="dealer-controls">
-          <input
-            placeholder="Ticket"
-            value={ticket}
-            onChange={(e) => setTicket(e.target.value)}
-          />
-          <button onClick={setCurrentTicket}>Set Ticket</button>
-          <button onClick={resetVotes}>Reset Votes</button>
-        </div>
-      )}
+
 
 
       <Debug/>
