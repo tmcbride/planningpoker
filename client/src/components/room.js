@@ -15,20 +15,20 @@ export function Room() {
   return (
     <div className="app">
       <div className="room-header">
-        <h2>Room: {roomId}</h2>
+        <h2>{roomId}</h2>
         <button className="leave-button" onClick={isViewer ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
       </div>
 
       <Votes/>
       {!isViewer && (
 
-          <div className="vote-buttons">
-            {[1, 2, 3, 5, 8, 13].map((v) => (
-              <button key={v} onClick={() => vote(v)}>
-                {v}
-              </button>
-            ))}
-          </div>
+        <div className="vote-buttons">
+          {[1, 2, 3, 5, 8, 13].map((v) => (
+            <button key={v} onClick={() => vote(v)}>
+              {v}
+            </button>
+          ))}
+        </div>
 
       )}
 
@@ -60,16 +60,22 @@ export function Room() {
         )}
       </div>
 
-      <p>Viewers:</p>
-      <ul>
-        {room && room.viewers && Object.values(room.viewers)
-          .map((user, idx) => (
-            <li key={idx}>{user.name}</li>
-          ))}
-      </ul>
-
-
-
+      <div>
+        <p>Peanut Gallery</p>
+        <ul className="viewers">
+          {room && room.viewers && Object.values(room.viewers)
+            .map((user, idx) => (
+              <li key={idx}>
+                <div className="viewer">
+                  <span className="viewer-icon">👤</span>
+                  <div>
+                    {user.name}
+                  </div>
+                </div>
+              </li>
+            ))}
+        </ul>
+      </div>
 
       <Debug/>
     </div>

@@ -8,10 +8,14 @@ function App() {
   const {room} = useRoom();
   let element = room ? <Room /> : <Lobby />;
   return (
-    <div className="App-header">
-      <h1>Planning Poker</h1>
-      {!room && (<NameInput/> )}
-      {element}
+    <div className="App">
+      <div className="App-header">
+        <h1>Planning Poker</h1>
+      </div>
+      <div className="App-content">
+        {!room && (<NameInput/> )}
+        {element}
+      </div>
     </div>
 );
 }
