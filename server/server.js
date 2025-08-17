@@ -2,6 +2,9 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const getHandlers = require("./socketHandlers");
+const fs = require('fs');
+
+const file = '../realistic_jira_tickets.json';
 
 const cors = require("cors");
 
@@ -56,6 +59,24 @@ app.get("/rooms", (req, res) => {
   }));
 
   res.json(roomList);
+});
+
+app.get("/tickets/:projectId", (req, res) => {
+  fs.readFile(file, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading JSON file:', err);
+      return;
+    }
+
+    try {
+      const jsonData = JSON.parse(data);
+      console.log('Parsed JSON data:', jsonData);
+      let resp = jsonData.hasOwnProperty(req.params.projectId) ? jsonData[req.params.projectId] : [];
+      res.json(resp);
+    } catch (parseError) {
+      console.error('Error parsing JSON:', parseError);
+    }
+  });
 });
 
 // // ---------- Initialize storage ----------

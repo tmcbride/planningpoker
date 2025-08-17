@@ -1,12 +1,13 @@
 import {useRoom} from "../contexts/RoomContext";
 import {Debug} from "./debug";
 import {Votes} from "./votes";
+import {DealerControls} from "./dealerControls";
 
 export function Room() {
   const {
-    room, roomId, ticket, setTicket, ticketDetails, setTicketDetails,
-    leaveRoomVoter, leaveRoomViewer, setCurrentTicket,
-    resetVotes, vote, getUserId
+    room, roomId,
+    leaveRoomVoter, leaveRoomViewer,
+    vote, getUserId
   } = useRoom();
 
   const isDealer = isUserDealer(getUserId());
@@ -18,53 +19,46 @@ export function Room() {
   }
 
   return (
-    <div className="app">
-      <div className="room-header">
-        <h2>{roomId}</h2>
-        <p style={{ marginLeft: "20px" }}>{dealer.name ? "Dealer - " + dealer.name : "No Dealer!!"}</p>
-        <button className="leave-button" onClick={isViewer ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
-      </div>
-
-      <Votes/>
-      {!isViewer && (
-        <div className="vote-buttons">
-          {[1, 2, 3, 5, 8, 13].map((v) => (
-            <button key={v} onClick={() => vote(v)} disabled={room.showVotes || !room.currentTicket}>
-              {v}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="room">
 
       {isDealer && (
-        <div className="dealer-controls">
-          <input
-            placeholder="Ticket Title"
-            value={ticket}
-            onChange={(e) => setTicket(e.target.value)}
-          />
-          <input
-            placeholder="Ticket Description"
-            value={ticketDetails}
-            onChange={(e) => setTicketDetails(e.target.value)}
-          />
-          <button onClick={setCurrentTicket}>Set Ticket</button>
-          <button onClick={resetVotes}>Reset Votes</button>
-        </div>
+        <DealerControls/>
       )}
 
-      <div className="ticket-info">
-        {room.currentTicket ? (
-          <div className="ticket-card">
-            <h4>{room.currentTicket.title}</h4>
-            <p>{room.currentTicket.details}</p>
+      <div className="room-content">
+        <div className="room-header">
+          <h2>{roomId}</h2>
+          <p style={{marginLeft: "20px"}}>{dealer.name ? "Dealer - " + dealer.name : "No Dealer!!"}</p>
+          <button className="leave-button" onClick={isViewer ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
+        </div>
+
+        <Votes/>
+        {!isViewer && (
+          <div className="vote-buttons">
+            {[1, 2, 3, 5, 8, 13].map((v) => (
+              <button key={v} onClick={() => vote(v)} disabled={room.showVotes || !room.currentTicket}>
+                {v}
+              </button>
+            ))}
           </div>
-        ) : (
-          <p>No ticket selected</p>
         )}
+
+        <div className="ticket-info">
+          {room.currentTicket ? (
+            <div className="ticket-card ticket-display">
+              <h4>{room.currentTicket.key} - {room.currentTicket.title}</h4>
+              <p>{room.currentTicket.description}</p>
+            </div>
+          ) : (
+            <p>No ticket selected</p>
+          )}
+        </div>
+
+        <Debug/>
       </div>
 
-      <Debug/>
+
+
     </div>
   );
 }
