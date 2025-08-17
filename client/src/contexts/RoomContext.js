@@ -58,6 +58,15 @@ export function RoomProvider({children}) {
     return () => socket.offAny(logEvent);
   }, [socket]);
 
+  useEffect(() => {
+    if (!socket) return;
+    const handleRoomClosed = () => {
+      leaveRoom();
+    };
+    socket.on("roomClosed", handleRoomClosed);
+    return () => socket.off("roomClosed", handleRoomClosed);
+  }, [socket]);
+
   const createRoom = () => {
     if (!roomId || !name) return alert("Enter name & room ID");
     socket.emit("createRoom", { roomId, name: name });
@@ -69,6 +78,10 @@ export function RoomProvider({children}) {
 
   const clearRooms = () => {
     socket.emit("clearRooms");
+  };
+
+  const closeRoom = () => {
+    socket.emit("closeRoom", {roomId: roomId});
   };
 
   const joinRoom = (roomIdToJoin) => {
@@ -99,6 +112,12 @@ export function RoomProvider({children}) {
 
   const leaveRoomViewer = () => {
     socket.emit("leaveRoomViewer", { roomId });
+    setRoom(null);
+    setRoomId("");
+    // localStorage.removeItem("roomId");
+  };
+
+  const leaveRoom = () => {
     setRoom(null);
     setRoomId("");
     // localStorage.removeItem("roomId");
@@ -137,6 +156,7 @@ export function RoomProvider({children}) {
         name,
         setName,
         roomId,
+        setRoom,
         setRoomId,
         ticket,
         setTicket,
@@ -151,6 +171,7 @@ export function RoomProvider({children}) {
         vote,
         getUserId,
         makeMeDealer,
+        closeRoom,
         socket
       }}
     >

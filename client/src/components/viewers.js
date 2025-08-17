@@ -3,7 +3,7 @@ import {useRoom} from "../contexts/RoomContext";
 export function Viewers() {
   const {
     room, getUserId, makeMeDealer,
-    roomId,
+    closeRoom,
     leaveRoomVoter, leaveRoomViewer,
   } = useRoom();
 
@@ -43,6 +43,9 @@ export function Viewers() {
         <button className="leave-button" onClick={isViewer ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
         {isViewer && !isDealer && (
           <button className="leave-button" onClick={makeMeDealer}>Make Me Dealer</button>
+        )}
+        {isDealer && (
+          <button className="leave-button" onClick={closeRoom}>Close Room</button>
         )}
       </div>
     </div>

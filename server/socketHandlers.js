@@ -30,8 +30,7 @@ function removeViewerFromRoom(rooms, roomId, socket) {
     const viewerIds = Object.keys(r.viewers);
     if (viewerIds.length > 0) {
       r.dealer = viewerIds[0];
-    }
-    else {
+    } else {
       r.dealer = null;
     }
   }
@@ -124,7 +123,7 @@ module.exports = (io, rooms, saveRooms) => ({
       room.showVotes = true;
     }
     await saveRooms();
-    io.to(roomId).emit("votesUpdate", { votes: room.votes, showVotes: room.showVotes});
+    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes});
   },
 
   requestRooms: (io) => {
@@ -147,7 +146,7 @@ module.exports = (io, rooms, saveRooms) => ({
       console.log("Voter leave viewer viewer:", rooms[roomId]);
       await saveRooms();
       socket.leave(roomId);
-      io.to(roomId).emit("viewerUpdate", { viewers: rooms[roomId].viewers, dealer: rooms[roomId].dealer });
+      io.to(roomId).emit("viewerUpdate", {viewers: rooms[roomId].viewers, dealer: rooms[roomId].dealer});
     }
   },
 
@@ -158,6 +157,13 @@ module.exports = (io, rooms, saveRooms) => ({
       await saveRooms();
       io.to(roomId).emit("roomUpdate", rooms[roomId]);
     }
+  },
+
+  closeRoom: async (io, {roomId}) => {
+    console.log("Deleting Room", roomId);
+    delete rooms[roomId];
+    await saveRooms();
+    io.to(roomId).emit("roomClosed");
   },
 
   disconnect: async (socket) => {

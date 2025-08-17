@@ -46,6 +46,7 @@ io.on("connection", (socket) => {
   socket.on("resetVotes", (data) => handlers.resetVotes(data));
   socket.on("disconnect", () => handlers.disconnect(socket));
   socket.on("clearRooms", () => clearRooms());
+  socket.on("closeRoom", async (data) => { await handlers.closeRoom(io, data); handlers.requestRooms(io) });
   socket.on("leaveRoomViewer", (data) => handlers.leaveRoomViewer(socket, data));
   socket.on("leaveRoomVoter", (data) => handlers.leaveRoomVoter(socket, data));
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));

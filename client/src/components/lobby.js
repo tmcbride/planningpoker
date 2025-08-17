@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 
 export function Lobby() {
   const {
-    socket, clearRooms, joinRoom, openRoom
+    socket, joinRoom, openRoom
   } = useRoom();
 
   const [availableRooms, setAvailableRooms] = useState([]);
@@ -37,8 +37,6 @@ export function Lobby() {
       <div className="roomList">
         <div className="room-header">
           <h2>Rooms</h2>
-          <button className="leave-button" onClick={clearRooms}>Clear Rooms</button>
-          <button onClick={getRoomList}>Refresh</button>
         </div>
         <div className="roomRow">
           {availableRooms.length === 0 && <div>No rooms available</div>}
