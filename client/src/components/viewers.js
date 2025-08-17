@@ -24,7 +24,7 @@ export function Viewers() {
       {room && room.viewers && Object.entries(room.viewers).length > 0 && (
         <div className="viewer-container">
           <ul className="viewers">
-            { Object.entries(room.viewers)
+            {Object.entries(room.viewers)
               .map(([id, user]) => (
                 <li key={id}>
                   <div className="viewer">
@@ -45,7 +45,11 @@ export function Viewers() {
           <button className="leave-button" onClick={makeMeDealer}>Make Me Dealer</button>
         )}
         {isDealer && (
-          <button className="leave-button" onClick={closeRoom}>Close Room</button>
+          <button className="leave-button" onClick={() => {
+            if (window.confirm("Are you sure you want to close the room for everyone?")) {
+              closeRoom();
+            }
+          }}>Close Room</button>
         )}
       </div>
     </div>
