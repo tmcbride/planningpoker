@@ -173,6 +173,11 @@
   font-size: 50px;
 }
 
+.highlight-vote {
+  font-weight: bold;
+  color: green;
+}
+
 button {
   background: linear-gradient(180deg, #4e8cff, #1c60d6);
   color: white;

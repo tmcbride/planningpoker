@@ -1,5 +1,5 @@
 import {useRoom} from "../contexts/RoomContext";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useMemo} from "react";
 
 export function Votes() {
   const {
@@ -14,12 +14,28 @@ export function Votes() {
         const first = votes[0];
         if (votes.every(v => v === first)) {
           setShowFireworks(true);
-          const timer = setTimeout(() => setShowFireworks(false), 3000);
+          const timer = setTimeout(() => setShowFireworks(false), 2800);
           return () => clearTimeout(timer);
         }
       }
     }
   }, [room.showVotes, room.votes]);
+
+
+  const mostCommonVote = useMemo(() => {
+    if (!room.votes) return null;
+    const counts = {};
+    let maxCount = 0;
+    let mostCommon = null;
+    Object.values(room.votes).forEach((vote) => {
+      counts[vote] = (counts[vote] || 0) + 1;
+      if (counts[vote] > maxCount) {
+        maxCount = counts[vote];
+        mostCommon = vote;
+      }
+    });
+    return mostCommon;
+  }, [room.votes]);
 
   return (
     <div>
@@ -36,15 +52,18 @@ export function Votes() {
                   <div className="flip-card-inner">
                     <div className="flip-card-front">
                       {voteValue !== undefined
-                      ? "✅"
-                      : ""}
+                        ? "✅"
+                        : ""}
                     </div>
-                    <div className="flip-card-back">
-                            {show
-                              ? voteValue ?? ""
-                              : voteValue !== undefined
-                                ? "✅"
-                                : ""}
+                    <div className={
+                      "flip-card-back " +
+                      (room.showVotes && voteValue === mostCommonVote ? "highlight-vote" : "")
+                    }>
+                      {show
+                        ? voteValue ?? ""
+                        : voteValue !== undefined
+                          ? "✅"
+                          : ""}
                     </div>
                   </div>
                 </div>
