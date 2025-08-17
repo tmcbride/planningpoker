@@ -29,7 +29,7 @@ export function Room() {
       {!isViewer && (
         <div className="vote-buttons">
           {[1, 2, 3, 5, 8, 13].map((v) => (
-            <button key={v} onClick={() => vote(v)} disabled={room.showVotes}>
+            <button key={v} onClick={() => vote(v)} disabled={room.showVotes || !room.currentTicket}>
               {v}
             </button>
           ))}

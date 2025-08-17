@@ -21,7 +21,6 @@ export function Votes() {
     }
   }, [room.showVotes, room.votes]);
 
-
   const mostCommonVote = useMemo(() => {
     if (!room.votes) return null;
     const counts = {};
