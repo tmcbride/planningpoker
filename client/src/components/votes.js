@@ -14,7 +14,7 @@ export function Votes() {
             const voteValue = room.votes[id];
             const show = room.showVotes || (id === getUserId() && voteValue !== undefined);
             return (
-              <div>
+              <div key={id}>
                 <div className={`flip-card ${show ? "flipped" : ""}`}>
                   <div className="flip-card-inner">
                     <div className="flip-card-front">

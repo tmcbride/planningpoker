@@ -64,7 +64,7 @@ export function RoomProvider({children}) {
   }, [socket]);
 
   useEffect(() => {
-    const handleViewerUpdate = (data) => setRoom(prev => prev ? ({ ...prev, viewers: data }) : prev);
+    const handleViewerUpdate = (data) => setRoom(prev => prev ? ({ ...prev, viewers: data.viewers, dealer: data.dealer }) : prev);
     socket.on("viewerUpdate", handleViewerUpdate);
     return () => socket.off("viewerUpdate", handleViewerUpdate);
   }, [socket]);
@@ -85,6 +85,10 @@ export function RoomProvider({children}) {
   const createRoom = () => {
     if (!roomId || !name) return alert("Enter name & room ID");
     socket.emit("createRoom", { roomId, name: name });
+  };
+
+  const makeMeDealer = () => {
+    socket.emit("makeMeDealer", {roomId: roomId});
   };
 
   const clearRooms = () => {
@@ -173,7 +177,8 @@ export function RoomProvider({children}) {
         setCurrentTicket,
         resetVotes,
         vote,
-        getUserId
+        getUserId,
+        makeMeDealer
       }}
     >
       {children}

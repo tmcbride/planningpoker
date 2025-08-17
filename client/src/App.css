@@ -23,6 +23,7 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+
 .App-header {
   display: flex;
   flex-direction: column;
@@ -186,6 +187,7 @@ button {
   transition: all 0.2s ease-in-out;
   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   margin: 0.2rem 0.5rem 0 0;
+  height: 3rem;
 }
 
 button:hover {

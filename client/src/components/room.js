@@ -4,35 +4,39 @@ import {Votes} from "./votes";
 
 export function Room() {
   const {
-    room,
-    roomId, ticket, setTicket, ticketDetails, setTicketDetails,
+    room, roomId, ticket, setTicket, ticketDetails, setTicketDetails,
     leaveRoomVoter, leaveRoomViewer, setCurrentTicket,
-    resetVotes, vote, getUserId
+    resetVotes, vote, getUserId, makeMeDealer
   } = useRoom();
 
+  const isDealer = isUserDealer(getUserId());
   const isViewer = !!room?.viewers?.[getUserId()];
+  const dealer = room.dealer && room.viewers[room.dealer] ? room.viewers[room.dealer] : "";
+
+  function isUserDealer(userId) {
+    return room.dealer === userId;
+  }
 
   return (
     <div className="app">
       <div className="room-header">
         <h2>{roomId}</h2>
+        <p style={{ marginLeft: "20px" }}>{dealer.name ? "Dealer - " + dealer.name : "No Dealer!!"}</p>
         <button className="leave-button" onClick={isViewer ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
       </div>
 
       <Votes/>
       {!isViewer && (
-
         <div className="vote-buttons">
           {[1, 2, 3, 5, 8, 13].map((v) => (
-            <button key={v} onClick={() => vote(v)}>
+            <button key={v} onClick={() => vote(v)} disabled={room.showVotes}>
               {v}
             </button>
           ))}
         </div>
-
       )}
 
-      {isViewer && (
+      {isDealer && (
         <div className="dealer-controls">
           <input
             placeholder="Ticket Title"
@@ -61,13 +65,16 @@ export function Room() {
       </div>
 
       <div>
-        <p>Peanut Gallery</p>
+        {isViewer && !isDealer && (
+          <button onClick={makeMeDealer}>Make Me Dealer</button>
+        )}
+
         <ul className="viewers">
-          {room && room.viewers && Object.values(room.viewers)
-            .map((user, idx) => (
-              <li key={idx}>
+          {room && room.viewers && Object.entries(room.viewers)
+            .map(([id, user]) => (
+              <li key={id}>
                 <div className="viewer">
-                  <span className="viewer-icon">👤</span>
+                  <span className="viewer-icon">{isUserDealer(id) ? "🃏" : "👤"}</span>
                   <div>
                     {user.name}
                   </div>

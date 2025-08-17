@@ -19,10 +19,21 @@ function removeViewerFromRoom(rooms, roomId, socket) {
 
   let found = false;
   const r = rooms[roomId];
-  if (r.viewers && r.viewers[socket.id]) {
-    console.log("Removing viewer:", socket.id, "from room:", roomId);
-    delete r.viewers[socket.id];
+  let userId = socket.id;
+  if (r.viewers && r.viewers[userId]) {
+    console.log("Removing viewer:", userId, "from room:", roomId);
+    delete r.viewers[userId];
     found = true;
+  }
+
+  if (r.dealer === userId) {
+    const viewerIds = Object.keys(r.viewers);
+    if (viewerIds.length > 0) {
+      r.dealer = viewerIds[0];
+    }
+    else {
+      r.dealer = null;
+    }
   }
 
   return found;
@@ -39,7 +50,7 @@ function refreshRooms(rooms, io) {
 
 module.exports = (io, rooms, saveRooms) => ({
   createRoom: async (socket, {roomId, name}) => {
-    rooms[roomId] = {viewers: {}, voters: {}, votes: {}, showVotes: false};
+    rooms[roomId] = {viewers: {}, dealer: socket.id, voters: {}, votes: {}, showVotes: false};
     rooms[roomId].viewers[socket.id] = {name};
 
     socket.join(roomId);
@@ -64,12 +75,24 @@ module.exports = (io, rooms, saveRooms) => ({
   openRoom: async (socket, {roomId, name}) => {
     console.log("Viewer joined:", roomId, name);
 
-    if (!rooms[roomId]) return;
+    let room = rooms[roomId];
+    if (!room) return;
     socket.join(roomId);
-    rooms[roomId].viewers[socket.id] = {name};
+    room.viewers[socket.id] = {name};
+
+    if (!room.dealer) {
+      room.dealer = socket.id;
+    }
+
+    io.to(roomId).emit("roomUpdate", room);
+    socket.emit("roomUpdate", room);
+    await saveRooms();
+  },
+
+  makeMeDealer: async (socket, {roomId}) => {
+    rooms[roomId].dealer = socket.id;
 
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
-    socket.emit("roomUpdate", rooms[roomId]);
     await saveRooms();
   },
 
@@ -124,7 +147,7 @@ module.exports = (io, rooms, saveRooms) => ({
       console.log("Voter leave viewer viewer:", rooms[roomId]);
       await saveRooms();
       socket.leave(roomId);
-      io.to(roomId).emit("viewerUpdate", rooms[roomId].viewers);
+      io.to(roomId).emit("viewerUpdate", { viewers: rooms[roomId].viewers, dealer: rooms[roomId].dealer });
     }
   },
 
