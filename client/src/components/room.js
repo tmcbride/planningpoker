@@ -1,12 +1,13 @@
 import {useRoom} from "../contexts/RoomContext";
 import {Debug} from "./debug";
 import {Votes} from "./votes";
+import {Viewers} from "./viewers";
 
 export function Room() {
   const {
     room, roomId, ticket, setTicket, ticketDetails, setTicketDetails,
     leaveRoomVoter, leaveRoomViewer, setCurrentTicket,
-    resetVotes, vote, getUserId, makeMeDealer
+    resetVotes, vote, getUserId
   } = useRoom();
 
   const isDealer = isUserDealer(getUserId());
@@ -64,26 +65,7 @@ export function Room() {
         )}
       </div>
 
-      <div>
-        {isViewer && !isDealer && (
-          <button onClick={makeMeDealer}>Make Me Dealer</button>
-        )}
-
-        <ul className="viewers">
-          {room && room.viewers && Object.entries(room.viewers)
-            .map(([id, user]) => (
-              <li key={id}>
-                <div className="viewer">
-                  <span className="viewer-icon">{isUserDealer(id) ? "🃏" : "👤"}</span>
-                  <div>
-                    {user.name}
-                  </div>
-                </div>
-              </li>
-            ))}
-        </ul>
-      </div>
-
+      <Viewers/>
       <Debug/>
     </div>
   );
