@@ -14,14 +14,14 @@ export function DealerControls() {
 
   // Fetch projects from the server when component mounts
   useEffect(() => {
-    fetch("http://localhost:4000/projects")
+    fetch("http://localhost:4000/api/projects")
       .then((res) => res.json())
       .then((data) => setProjectList(data))
       .catch((err) => console.error("Error fetching projects:", err));
   }, []);
 
   function getTicketList() {
-    fetch(`http://localhost:4000/tickets/${project}`)
+    fetch(`http://localhost:4000/api/tickets/${project}`)
       .then(res => res.json())
       .then(data => {
         setTicketList(data);

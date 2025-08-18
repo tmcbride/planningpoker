@@ -10,7 +10,7 @@ export function Lobby() {
   const [availableRooms, setAvailableRooms] = useState([]);
 
   function getRoomList() {
-    fetch("http://localhost:4000/rooms")
+    fetch("http://localhost:4000/api/rooms")
       .then(res => res.json())
       .then(data => {
         setAvailableRooms(data);
