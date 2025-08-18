@@ -38,7 +38,7 @@ export function Lobby() {
         <div className="room-header">
           <h2>Rooms</h2>
         </div>
-        <div className="roomRow">
+        <div>
           {availableRooms.length === 0 && <div>No rooms available</div>}
           {availableRooms.map(room => (
             <div className="roomRow roomEntry" key={room.id}>

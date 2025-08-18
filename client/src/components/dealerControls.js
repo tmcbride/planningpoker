@@ -64,7 +64,7 @@ export function DealerControls() {
               }
                    onClick={() => setCurrentTicket(ticket)}>
                 <h4>{ticket.key} - {ticket.title}</h4>
-                <p>{ticket.description}</p>
+                {/*<p>{ticket.description}</p>*/}
               </div>
             </div>
           ))
