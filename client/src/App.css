@@ -228,7 +228,7 @@
 }
 
 .flip-card-front {
-    background: linear-gradient(180deg, #34A853 , #0D652D);
+    background: linear-gradient(180deg, #34A853 , #096f2e);
     color: white;
     font-size: 8vh;
     font-weight: bold;
@@ -238,7 +238,7 @@
     background-color: white;
     transform: rotateY(180deg);
     border-radius: 8px;
-    font-size: 50px;
+    font-size: 8vh;
 }
 
 .highlight-vote {
