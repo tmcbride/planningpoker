@@ -9,7 +9,6 @@
 .App {
     display: flex;
     flex-direction: column;
-    /*height: 100vh; !* vh = viewport height *!*/
 }
 
 .App-logo {
@@ -117,8 +116,7 @@
     display: flex;
     flex-direction: row;
     margin-top: 2rem;
-    height: calc(100vh - 220px); /* full viewport height */
-    /*overflow:hidden;*/
+    height: calc(100vh - 220px);
 }
 
 .room-header {
@@ -131,8 +129,8 @@
 .room-content {
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* take remaining horizontal space */
-    min-height: 0; /* allows children with overflow to scroll properly */
+    flex-grow: 1;
+    min-height: 0;
     padding: 1rem;
     width: 60vw;
 }
