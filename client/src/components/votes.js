@@ -51,7 +51,7 @@ export function Votes() {
                   <div className="flip-card-inner">
                     <div className="flip-card-front">
                       {voteValue !== undefined
-                        ? "✅"
+                        ? <div>&#x2713;</div>
                         : ""}
                     </div>
                     <div className={
@@ -61,7 +61,7 @@ export function Votes() {
                       {show
                         ? voteValue ?? ""
                         : voteValue !== undefined
-                          ? "✅"
+                          ? <div>&#x2713;</div>
                           : ""}
                     </div>
                   </div>

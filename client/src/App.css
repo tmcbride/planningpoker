@@ -19,6 +19,7 @@
 
 .App-title {
     width: 20vw;
+    padding-left: 2vw;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -228,7 +229,9 @@
 
 .flip-card-front {
     background: linear-gradient(180deg, #34A853 , #0D652D);
-    color: black;
+    color: white;
+    font-size: 8vh;
+    font-weight: bold;
 }
 
 .flip-card-back {
