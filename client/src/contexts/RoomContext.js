@@ -163,7 +163,8 @@ export function RoomProvider({children}) {
     socket.emit("vote", { roomId, vote: value });
   };
 
-  const isCurrentUserViewer = () => !!room?.viewers?.[currentUserId];
+  const isCurrentUserViewer = () => !!room?.viewers?.[socket.id];
+  const isCurrentUserVoter = () => !!room?.voters?.[socket.id];
 
   const isUserDealer = (userId) => {
     console.log(
@@ -204,7 +205,8 @@ export function RoomProvider({children}) {
         socket,
         isUserDealer,
         isCurrentUserDealer,
-        isCurrentUserViewer
+        isCurrentUserViewer,
+        isCurrentUserVoter
       }}
     >
       {children}

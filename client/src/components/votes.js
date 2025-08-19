@@ -3,7 +3,7 @@ import {useEffect, useState, useMemo} from "react";
 
 export function Votes() {
   const {
-    room, currentUserId, isCurrentUserViewer, vote
+    room, currentUserId, isCurrentUserVoter, vote
   } = useRoom();
   const [showFireworks, setShowFireworks] = useState(false);
 
@@ -22,17 +22,34 @@ export function Votes() {
   }, [room.showVotes, room.votes]);
 
   const mostCommonVote = useMemo(() => {
-    if (!room.votes) return null;
+    if (!room.votes || !room.showVotes) {
+      return null;
+    }
+
+    const votes = Object.values(room.votes).filter(v => v !== undefined);
+    if (votes.length < 3) {
+      const first = votes[0];
+      if (votes.every(v => v === first)) {
+        console.log("Most Common Vote ", first);
+        return first;
+      }
+
+      console.log("Votes don't all match ", first);
+      return null;
+    }
+
     const counts = {};
     let maxCount = 0;
     let mostCommon = null;
-    Object.values(room.votes).forEach((vote) => {
+
+    votes.forEach((vote) => {
       counts[vote] = (counts[vote] || 0) + 1;
       if (counts[vote] > maxCount) {
         maxCount = counts[vote];
         mostCommon = vote;
       }
     });
+
     return mostCommon;
   }, [room.votes]);
 
@@ -72,7 +89,7 @@ export function Votes() {
           })}
       </div>
 
-      {!isCurrentUserViewer && (
+      {isCurrentUserVoter() && (
         <div className="vote-buttons">
           {[1, 2, 3, 5, 8, 13].map((v) => (
             <button key={v} onClick={() => vote(v)} disabled={room.showVotes || !room.currentTicket}>

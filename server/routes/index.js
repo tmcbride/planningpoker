@@ -23,7 +23,6 @@ module.exports = (rooms) => {
 
       try {
         const jsonData = JSON.parse(data);
-        console.log('Parsed JSON data:', jsonData);
         let resp = jsonData.hasOwnProperty(req.params.projectId) ? jsonData[req.params.projectId] : [];
         res.json(resp);
       } catch (parseError) {

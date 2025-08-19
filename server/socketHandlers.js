@@ -38,8 +38,8 @@ function refreshRooms(rooms, io) {
   io.emit("roomsList", roomList);
 }
 
-module.exports = (io, rooms, saveRooms) => ({
-  createRoom: async (socket, {roomId, name, userId}) => {
+module.exports = (io, rooms) => ({
+  createRoom: (socket, {roomId, name, userId}) => {
     rooms[roomId] = {viewers: {}, dealer: {name, userId}, voters: {}, votes: {}, showVotes: false};
 
     socket.join(roomId);
@@ -48,7 +48,7 @@ module.exports = (io, rooms, saveRooms) => ({
     refreshRooms(rooms, io);
   },
 
-  joinRoom: async (socket, {roomId, name}) => {
+  joinRoom: (socket, {roomId, name}) => {
     console.log("Voter joined:", roomId, name);
 
     if (!rooms[roomId]) return;
@@ -57,11 +57,9 @@ module.exports = (io, rooms, saveRooms) => ({
 
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
     socket.emit("roomUpdate", rooms[roomId]);
+    },
 
-    await saveRooms();
-  },
-
-  openRoom: async (socket, {roomId, name}) => {
+  openRoom: (socket, {roomId, name}) => {
     console.log("Viewer joined:", roomId, name);
 
     let room = rooms[roomId];
@@ -75,29 +73,25 @@ module.exports = (io, rooms, saveRooms) => ({
 
     io.to(roomId).emit("roomUpdate", room);
     socket.emit("roomUpdate", room);
-    await saveRooms();
   },
 
-  makeMeDealer: async (socket, {roomId}) => {
+  makeMeDealer: (socket, {roomId}) => {
     rooms[roomId].dealer = socket.id;
 
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
-    await saveRooms();
   },
 
-  setTicket: async ({roomId, ticket}) => {
+  setTicket: ({roomId, ticket}) => {
     if (rooms[roomId]) {
       rooms[roomId].currentTicket = ticket;
       rooms[roomId].votes = {};
       rooms[roomId].showVotes = false;
 
-      await saveRooms();
-
       io.to(roomId).emit("roomUpdate", rooms[roomId]);
     }
   },
 
-  vote: async (socket, {roomId, vote}) => {
+  vote: (socket, {roomId, vote}) => {
     if (!rooms[roomId]) return;
     rooms[roomId].votes[socket.id] = vote;
 
@@ -112,7 +106,7 @@ module.exports = (io, rooms, saveRooms) => ({
     if (allVoted) {
       room.showVotes = true;
     }
-    await saveRooms();
+
     io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes});
   },
 
@@ -120,43 +114,39 @@ module.exports = (io, rooms, saveRooms) => ({
     refreshRooms(rooms, io);
   },
 
-  leaveRoomVoter: async (socket, {roomId}) => {
+  leaveRoomVoter: (socket, {roomId}) => {
     let found = removeVoterFromRoom(rooms, roomId, socket);
     if (found) {
-      await saveRooms();
       socket.leave(roomId);
       io.to(roomId).emit("voterUpdate", rooms[roomId].voters);
     }
   },
 
-  leaveRoomViewer: async (socket, {roomId}) => {
+  leaveRoomViewer: (socket, {roomId}) => {
     let found = removeViewerFromRoom(rooms, roomId, socket);
     console.log(found);
     if (found) {
       console.log("Voter leave viewer viewer:", rooms[roomId]);
-      await saveRooms();
       socket.leave(roomId);
       io.to(roomId).emit("viewerUpdate", {viewers: rooms[roomId].viewers, dealer: rooms[roomId].dealer});
     }
   },
 
-  resetVotes: async ({roomId}) => {
+  resetVotes: ({roomId}) => {
     if (rooms[roomId]) {
       rooms[roomId].votes = {};
       rooms[roomId].showVotes = false;
-      await saveRooms();
       io.to(roomId).emit("roomUpdate", rooms[roomId]);
     }
   },
 
-  closeRoom: async (io, {roomId}) => {
+  closeRoom: (io, {roomId}) => {
     console.log("Deleting Room", roomId);
     delete rooms[roomId];
-    await saveRooms();
     io.to(roomId).emit("roomClosed");
   },
 
-  disconnect: async (socket) => {
+  disconnect: (socket) => {
     console.log("Voter disconnected:", socket.id);
     for (const roomId of Object.keys(rooms)) {
       console.log("Looking for:", socket.id, " in ", rooms[roomId]);
@@ -169,7 +159,6 @@ module.exports = (io, rooms, saveRooms) => ({
       }
 
       if (found) {
-        await saveRooms();
         io.to(roomId).emit("roomUpdate", rooms[roomId]);
         break;
       }

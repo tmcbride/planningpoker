@@ -3,8 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const getHandlers = require("./socketHandlers");
 const cors = require("cors");
-
-// const storage = require("node-persist");
+const path = require("path");
 
 const app = express();
 app.use(cors());
@@ -32,12 +31,7 @@ const io = new Server(server, {
   }
 });
 
-const ROOMS_KEY = "rooms";
 let handlers;
-
-async function saveRooms() {
-  // await storage.setItem(ROOMS_KEY, rooms);
-}
 
 async function clearRooms() {
   console.log("Clearing Rooms");
@@ -57,21 +51,13 @@ io.on("connection", (socket) => {
   socket.on("resetVotes", (data) => handlers.resetVotes(data));
   socket.on("disconnect", () => handlers.disconnect(socket));
   socket.on("clearRooms", () => clearRooms());
-  socket.on("closeRoom", async (data) => { await handlers.closeRoom(io, data); handlers.requestRooms(io) });
+  socket.on("closeRoom",  (data) => { handlers.closeRoom(io, data); handlers.requestRooms(io) });
   socket.on("leaveRoomViewer", (data) => handlers.leaveRoomViewer(socket, data));
   socket.on("leaveRoomVoter", (data) => handlers.leaveRoomVoter(socket, data));
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));
   socket.on("makeMeDealer", (data) => handlers.makeMeDealer(socket, data));
 });
 
-// // ---------- Initialize storage ----------
-// (async () => {
-//   await storage.init({ dir: "./tmp-storage", stringify: JSON.stringify });
-//   rooms = (await storage.getItem(ROOMS_KEY)) || {};
-//   console.log("Loaded rooms from storage:", rooms);
-//   handlers = getHandlers(io, rooms, saveRooms, broadcastRooms);
-// })();
-
-handlers = getHandlers(io, rooms, saveRooms);
+handlers = getHandlers(io, rooms);
 
 server.listen(4000, "0.0.0.0", () => console.log("Server running on port 4000"));
