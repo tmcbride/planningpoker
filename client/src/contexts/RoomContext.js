@@ -22,7 +22,7 @@ function randomId(length = 8) {
 export function RoomProvider({children}) {
   const [room, setRoom] = useState(null);
   const [name, setName] = useState(localStorage.getItem("name"));
-  const [roomId, setRoomId] = useState("");
+  const [roomId, setRoomId] = useState(localStorage.getItem("name"));
   let initialState = loadOrGenerateUserId();
   const [currentUserId, setUserId] = useState(initialState);
   const [ticket, setTicket] = useState(null);
@@ -38,6 +38,10 @@ export function RoomProvider({children}) {
   useEffect(() => {
     localStorage.setItem("name", name);
   }, [name]);
+
+  useEffect(() => {
+    localStorage.setItem("roomId", roomId);
+  }, [roomId]);
 
   useEffect(() => {
     const handleRoomUpdate = (data) => setRoom(data);
