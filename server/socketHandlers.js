@@ -26,15 +26,6 @@ function removeViewerFromRoom(rooms, roomId, socket) {
     found = true;
   }
 
-  if (r.dealer === userId) {
-    const viewerIds = Object.keys(r.viewers);
-    if (viewerIds.length > 0) {
-      r.dealer = viewerIds[0];
-    } else {
-      r.dealer = null;
-    }
-  }
-
   return found;
 }
 
@@ -48,9 +39,8 @@ function refreshRooms(rooms, io) {
 }
 
 module.exports = (io, rooms, saveRooms) => ({
-  createRoom: async (socket, {roomId, name}) => {
-    rooms[roomId] = {viewers: {}, dealer: socket.id, voters: {}, votes: {}, showVotes: false};
-    rooms[roomId].viewers[socket.id] = {name};
+  createRoom: async (socket, {roomId, name, userId}) => {
+    rooms[roomId] = {viewers: {}, dealer: {name, userId}, voters: {}, votes: {}, showVotes: false};
 
     socket.join(roomId);
     io.to(roomId).emit("roomUpdate", rooms[roomId]);

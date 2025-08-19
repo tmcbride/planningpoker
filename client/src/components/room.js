@@ -5,34 +5,14 @@ import {DealerControls} from "./dealerControls";
 
 export function Room() {
   const {
-    room,
-    vote, getUserId
+    room, isCurrentUserDealer
   } = useRoom();
-
-  const isDealer = isUserDealer(getUserId());
-  const isViewer = !!room?.viewers?.[getUserId()];
-
-  function isUserDealer(userId) {
-    return room.dealer === userId;
-  }
 
   return (
     <div className="room">
-      {isDealer && (
         <DealerControls/>
-      )}
-
       <div className="room-content">
         <Votes/>
-        {!isViewer && (
-          <div className="vote-buttons">
-            {[1, 2, 3, 5, 8, 13].map((v) => (
-              <button key={v} onClick={() => vote(v)} disabled={room.showVotes || !room.currentTicket}>
-                {v}
-              </button>
-            ))}
-          </div>
-        )}
 
         <div className="ticket-info">
           {room.currentTicket ? (
@@ -47,9 +27,6 @@ export function Room() {
 
         <Debug/>
       </div>
-
-
-
     </div>
   );
 }

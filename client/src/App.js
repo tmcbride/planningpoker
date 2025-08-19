@@ -3,24 +3,26 @@ import { useRoom } from "./contexts/RoomContext";
 import { Lobby } from "./components/lobby";
 import { Room } from "./components/room";
 import {NameInput} from "./components/nameInput";
-import {Viewers} from "./components/viewers";
+import {RoomControls} from "./components/roomControls";
 
 function App() {
   const {room, roomId} = useRoom();
-  const dealer = room && room.dealer && room.viewers[room.dealer] ? room.viewers[room.dealer] : "";
+  const dealer = room && room.dealer ? room.dealer : "";
+
   let element = room ? <Room /> : <Lobby />;
   return (
     <div className="App">
       <div className="App-header">
-        <h1>Planning Poker</h1>
+        <h1 className="App-title">Scrum Poker</h1>
+
         { room && (
           <div className="room-title">
             <h2>{roomId}</h2>
-            <h3>{dealer.name ? "Dealer - " + dealer.name : "No Dealer!!"}</h3>
+            <h3>{"Product Owner - " + dealer.name }</h3>
           </div>
         )}
 
-        <Viewers/>
+        <RoomControls/>
       </div>
       <div className="App-content">
         {!room && (<NameInput/> )}

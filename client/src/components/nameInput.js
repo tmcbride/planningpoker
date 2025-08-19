@@ -18,7 +18,7 @@ export function NameInput() {
 
         <input
 
-          placeholder="Room ID"
+          placeholder="Sprint Name"
           value={roomId}
           onChange={(e) => setRoomId(e.target.value)}
         />

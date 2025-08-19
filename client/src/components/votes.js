@@ -3,7 +3,7 @@ import {useEffect, useState, useMemo} from "react";
 
 export function Votes() {
   const {
-    room, getUserId
+    room, currentUserId, isCurrentUserViewer, vote
   } = useRoom();
   const [showFireworks, setShowFireworks] = useState(false);
 
@@ -44,14 +44,14 @@ export function Votes() {
           .map(([id, voter]) => {
             if (!room) return;
             const voteValue = room.votes[id];
-            const show = room.showVotes || (id === getUserId() && voteValue !== undefined);
+            const show = room.showVotes || (id === currentUserId && voteValue !== undefined);
             return (
               <div key={id}>
                 <div className={`flip-card ${show ? "flipped" : ""}`}>
                   <div className="flip-card-inner">
                     <div className="flip-card-front">
                       {voteValue !== undefined
-                        ? "✅"
+                        ? <div>&#x2713;</div>
                         : ""}
                     </div>
                     <div className={
@@ -61,7 +61,7 @@ export function Votes() {
                       {show
                         ? voteValue ?? ""
                         : voteValue !== undefined
-                          ? "✅"
+                          ? <div>&#x2713;</div>
                           : ""}
                     </div>
                   </div>
@@ -71,6 +71,16 @@ export function Votes() {
             );
           })}
       </div>
+
+      {!isCurrentUserViewer && (
+        <div className="vote-buttons">
+          {[1, 2, 3, 5, 8, 13].map((v) => (
+            <button key={v} onClick={() => vote(v)} disabled={room.showVotes || !room.currentTicket}>
+              {v}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
