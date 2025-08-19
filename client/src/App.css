@@ -101,9 +101,8 @@
     flex-direction: column;
 }
 
-.dealer-controls input {
-    margin-right: 0.5rem;
-    margin-top: 2rem;
+.dealer-controls input, .dealer-controls select {
+    margin-left: 0;
     padding: 0.5rem;
 }
 
@@ -295,7 +294,7 @@ h2 {
 
 input, select {
     width: 100%;
-    max-width: 300px;
+    /*max-width: 300px;*/
     padding: 0.6rem 0.9rem;
     border: 2px solid #ccc;
     border-radius: 8px;
@@ -428,6 +427,11 @@ input:disabled {
     flex-shrink: 1;
     overflow-y: auto;
     margin: 0.5rem 0;
+}
+
+.ticket-display-pre {
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .ticket-list {

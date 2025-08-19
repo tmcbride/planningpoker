@@ -2,8 +2,12 @@ const fs = require('fs');
 const express = require("express");
 const router = express.Router();
 const path = require("path");
+const axios = require('axios');
 
-const file = path.join(__dirname, "../../realistic_jira_tickets.json");
+const BOARD_CACHE_TTL = 1000 * 60 * 1000;
+let boardsCache = { data: null, timestamp: 0 };
+let projectsCache = {};
+
 module.exports = (rooms) => {
   router.get("/rooms", (req, res) => {
     const roomList = Object.keys(rooms).map(roomId => ({
@@ -14,38 +18,69 @@ module.exports = (rooms) => {
     res.json(roomList);
   });
 
-  router.get("/tickets/:projectId", (req, res) => {
-    fs.readFile(file, 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading JSON file:', err);
-        return;
-      }
-
-      try {
-        const jsonData = JSON.parse(data);
-        let resp = jsonData.hasOwnProperty(req.params.projectId) ? jsonData[req.params.projectId] : [];
-        res.json(resp);
-      } catch (parseError) {
-        console.error('Error parsing JSON:', parseError);
-      }
-    });
+  router.get("/tickets/:projectId", async (req, res) => {
+    const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/backlog?maxResults=10`; //&jql=fixVersion=${req.params.fixVersion}`;
+    console.log(jiraUrl);
+    let data = await makeJiraCall(jiraUrl);
+    console.log(data);
+    res.json(data);
   });
 
-  router.get("/projects", (req, res) => {
-    fs.readFile(file, 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading JSON file:', err);
-        return;
-      }
+  async function makeJiraCall(jiraUrl) {
+    try {
+      const res = await axios.get(jiraUrl, {
+        headers: {Authorization: process.env.JIRA_AUTH_TOKEN},
+        httpsAgent: new (require('https').Agent)({rejectUnauthorized: false})
+      });
+      return res.data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
 
-      try {
-        const jsonData = JSON.parse(data);
-        let resp = Object.keys(jsonData);
-        res.json(resp);
-      } catch (parseError) {
-        console.error('Error parsing JSON:', parseError);
-      }
-    });
+  async function getBoardsCached() {
+    const now = Date.now();
+    if (boardsCache.data && (now - boardsCache.timestamp < BOARD_CACHE_TTL)) {
+      console.log("Got Board list from Cache");
+      return boardsCache.data;
+    }
+    const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board?type=scrum`;
+    let data = await makeJiraCall(jiraUrl, now);
+    boardsCache = {data: data, timestamp: now};
+    return data;
+  }
+
+  router.get("/projects", async (req, res) => {
+    const data = await getBoardsCached();
+    res.json(data);
+  });
+
+  async function getProjectVersions(boardId) {
+    console.log("Getting project versions for ", boardId);
+    const now = Date.now();
+    if (projectsCache[boardId] && projectsCache[boardId].data && (now - projectsCache[boardId].timestamp < BOARD_CACHE_TTL)) {
+      console.log("Got Project list from Cache");
+      return projectsCache[boardId].data;
+    }
+
+    let project = await makeJiraCall(`${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${boardId}/project`);
+    if (!project) {
+      console.log("Can't find project for board: " + boardId);
+      return null;
+    }
+    console.log("Got Board: ", project);
+
+    let projectKey = project.values[0].id;
+
+    const versions = await makeJiraCall(`${process.env.BASE_JIRA_URL}/rest/api/2/project/${projectKey}/versions`);
+    projectsCache[boardId] = {data: versions, timestamp: now};
+    return versions;
+  }
+
+  router.get("/projectList/:boardId", async (req, res) => {
+    const data = await getProjectVersions(req.params.boardId);
+    res.json(data);
   });
 
   return router;
