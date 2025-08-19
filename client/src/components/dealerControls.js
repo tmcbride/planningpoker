@@ -12,17 +12,18 @@ export function DealerControls() {
   const [project, setProject] = useState("");
   const [projectList, setProjectList] = useState([]);
   const [ticketList, setTicketList] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   // Fetch projects from the server when component mounts
   useEffect(() => {
-    fetch("http://localhost:4000/api/projects")
+    fetch(`${apiUrl}/api/projects`)
       .then((res) => res.json())
       .then((data) => setProjectList(data))
       .catch((err) => console.error("Error fetching projects:", err));
-  }, []);
+  }, [apiUrl]);
 
   function getTicketList() {
-    fetch(`http://localhost:4000/api/tickets/${project}`)
+    fetch(`${apiUrl}/api/tickets/${project}`)
       .then(res => res.json())
       .then(data => {
         setTicketList(data);

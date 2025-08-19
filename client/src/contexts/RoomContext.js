@@ -24,13 +24,14 @@ export function RoomProvider({children}) {
   const [name, setName] = useState(localStorage.getItem("name"));
   const [roomId, setRoomId] = useState(localStorage.getItem("name"));
   let initialState = loadOrGenerateUserId();
-  const [currentUserId, setUserId] = useState(initialState);
+  const [currentUserId] = useState(initialState);
   const [ticket, setTicket] = useState(null);
 
   const socketRef = useRef(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   if (!socketRef.current) {
-    socketRef.current = io("http://localhost:4000");
+    socketRef.current = io(apiUrl);
   }
 
   const socket = socketRef.current;

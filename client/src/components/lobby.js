@@ -8,15 +8,7 @@ export function Lobby() {
   } = useRoom();
 
   const [availableRooms, setAvailableRooms] = useState([]);
-
-  function getRoomList() {
-    fetch("http://localhost:4000/api/rooms")
-      .then(res => res.json())
-      .then(data => {
-        setAvailableRooms(data);
-      })
-      .catch(err => console.error("Error fetching rooms:", err));
-  }
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const handleRoomUpdate = (data) => {
@@ -28,8 +20,13 @@ export function Lobby() {
   }, [socket]);
 
   useEffect(() => {
-    getRoomList();
-  }, []);
+    fetch(`${apiUrl}/api/rooms`)
+      .then(res => res.json())
+      .then(data => {
+        setAvailableRooms(data);
+      })
+      .catch(err => console.error("Error fetching rooms:", err));
+    }, [apiUrl]);
 
   function isRoomDealer(room) {
     console.log("Comparing " + room.dealerId + " and " + currentUserId);
