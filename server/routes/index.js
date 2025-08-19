@@ -40,7 +40,6 @@ module.exports = (rooms) => {
 
       try {
         const jsonData = JSON.parse(data);
-        console.log('Parsed JSON data:', jsonData);
         let resp = Object.keys(jsonData);
         res.json(resp);
       } catch (parseError) {

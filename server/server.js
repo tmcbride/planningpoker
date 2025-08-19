@@ -55,7 +55,6 @@ io.on("connection", (socket) => {
   socket.on("leaveRoomViewer", (data) => handlers.leaveRoomViewer(socket, data));
   socket.on("leaveRoomVoter", (data) => handlers.leaveRoomVoter(socket, data));
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));
-  socket.on("makeMeDealer", (data) => handlers.makeMeDealer(socket, data));
 });
 
 handlers = getHandlers(io, rooms);

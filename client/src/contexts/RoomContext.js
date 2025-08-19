@@ -15,7 +15,7 @@ function loadOrGenerateUserId() {
   return userId;
 }
 
-function randomId(length = 8) {
+function randomId(length = 12) {
   return Math.random().toString(36).substring(2, 2 + length);
 }
 
@@ -88,10 +88,6 @@ export function RoomProvider({children}) {
     socket.emit("createRoom", { roomId: roomId, name: name, userId: currentUserId });
   };
 
-  const makeMeDealer = () => {
-    socket.emit("makeMeDealer", {roomId: roomId});
-  };
-
   const clearRooms = () => {
     socket.emit("clearRooms");
   };
@@ -107,7 +103,7 @@ export function RoomProvider({children}) {
     // localStorage.setItem("username", name);
     // localStorage.setItem("roomId", roomIdToJoin);
 
-    socket.emit("joinRoom", { roomId: roomIdToJoin, name: name });
+    socket.emit("joinRoom", { roomId: roomIdToJoin, name: name, userId: currentUserId });
     setRoomId(roomIdToJoin);
   };
 
@@ -115,19 +111,19 @@ export function RoomProvider({children}) {
     if (!roomIdToJoin || !name) return alert("Enter name");
 
     // localStorage.setItem("roomId", roomIdToJoin);
-    socket.emit("openRoom", { roomId: roomIdToJoin, name: name});
+    socket.emit("openRoom", { roomId: roomIdToJoin, name: name, userId: currentUserId});
     setRoomId(roomIdToJoin);
   };
 
   const leaveRoomVoter = () => {
-    socket.emit("leaveRoomVoter", { roomId });
+    socket.emit("leaveRoomVoter", { roomId, userId: currentUserId });
     setRoom(null);
     setRoomId("");
     // localStorage.removeItem("roomId");
   };
 
   const leaveRoomViewer = () => {
-    socket.emit("leaveRoomViewer", { roomId });
+    socket.emit("leaveRoomViewer", { roomId, userId: currentUserId });
     setRoom(null);
     setRoomId("");
     // localStorage.removeItem("roomId");
@@ -160,11 +156,11 @@ export function RoomProvider({children}) {
   };
 
   const vote = (value) => {
-    socket.emit("vote", { roomId, vote: value });
+    socket.emit("vote", { roomId, vote: value, userId: currentUserId });
   };
 
-  const isCurrentUserViewer = () => !!room?.viewers?.[socket.id];
-  const isCurrentUserVoter = () => !!room?.voters?.[socket.id];
+  const isCurrentUserViewer = () => !!room?.viewers?.[currentUserId];
+  const isCurrentUserVoter = () => !!room?.voters?.[currentUserId];
 
   const isUserDealer = (userId) => {
     console.log(
@@ -200,7 +196,6 @@ export function RoomProvider({children}) {
         resetVotes,
         vote,
         currentUserId,
-        makeMeDealer,
         closeRoom,
         socket,
         isUserDealer,

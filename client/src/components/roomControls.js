@@ -21,9 +21,6 @@ export function RoomControls() {
           <button className="leave-button" onClick={isCurrentUserViewer() ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
         )}
 
-        {/*{isViewer && !isDealer && (*/}
-        {/*  <button className="leave-button" onClick={makeMeDealer}>Make Me Dealer</button>*/}
-        {/*)}*/}
         {isDealer && (
           <button className="leave-button" onClick={() => {
             if (window.confirm("Are you sure you want to close the room for everyone?")) {

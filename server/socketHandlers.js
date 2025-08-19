@@ -1,29 +1,46 @@
-function removeVoterFromRoom(rooms, roomId, socket) {
+function removeVoterFromRoom(rooms, roomId, userId) {
   if (!rooms || !rooms[roomId]) return false;
 
   let found = false;
   const r = rooms[roomId];
-  if (r.voters && r.voters[socket.id]) {
-    console.log("Removing voter:", socket.id, "from room:", roomId);
+  if (r.voters && r.voters[userId]) {
+    console.log("Removing voter:", userId, "from room:", roomId);
 
-    delete r.voters[socket.id];
-    delete r.votes[socket.id];
+    delete r.voters[userId];
+    delete r.votes[userId];
     found = true;
   }
 
   return found;
 }
 
-function removeViewerFromRoom(rooms, roomId, socket) {
+function removeViewerFromRoom(rooms, roomId, userId) {
   if (!rooms || !rooms[roomId]) return false;
 
   let found = false;
   const r = rooms[roomId];
-  let userId = socket.id;
   if (r.viewers && r.viewers[userId]) {
     console.log("Removing viewer:", userId, "from room:", roomId);
     delete r.viewers[userId];
     found = true;
+  }
+
+  return found;
+}
+
+function removeUserBySocketId(rooms, roomId, socketId) {
+  if (!rooms || !rooms[roomId]) return false;
+
+  const r = rooms[roomId];
+  let found = false;
+  let viewer = Object.values(r.viewers).find(v => v.socketId === socketId);
+  if (viewer) {
+    found = removeViewerFromRoom(rooms, roomId, viewer.userId);
+  }
+
+  let voter = Object.values(r.voters).find(v => v.socketId === socketId);
+  if (voter) {
+    found ||= removeVoterFromRoom(rooms, roomId, voter.userId);
   }
 
   return found;
@@ -48,37 +65,27 @@ module.exports = (io, rooms) => ({
     refreshRooms(rooms, io);
   },
 
-  joinRoom: (socket, {roomId, name}) => {
-    console.log("Voter joined:", roomId, name);
+  joinRoom: (socket, {roomId, name, userId}) => {
+    console.log("Voter joined:", roomId, name, userId);
 
     if (!rooms[roomId]) return;
     socket.join(roomId);
-    rooms[roomId].voters[socket.id] = {name};
+    rooms[roomId].voters[userId] = {name, userId, socketId: socket.id};
 
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
     socket.emit("roomUpdate", rooms[roomId]);
     },
 
-  openRoom: (socket, {roomId, name}) => {
-    console.log("Viewer joined:", roomId, name);
+  openRoom: (socket, {roomId, name, userId}) => {
+    console.log("Viewer joined:", roomId, name, userId);
 
     let room = rooms[roomId];
     if (!room) return;
     socket.join(roomId);
-    room.viewers[socket.id] = {name};
-
-    if (!room.dealer) {
-      room.dealer = socket.id;
-    }
+    room.viewers[userId] = {name, userId, socketId: socket.id};
 
     io.to(roomId).emit("roomUpdate", room);
     socket.emit("roomUpdate", room);
-  },
-
-  makeMeDealer: (socket, {roomId}) => {
-    rooms[roomId].dealer = socket.id;
-
-    io.to(roomId).emit("roomUpdate", rooms[roomId]);
   },
 
   setTicket: ({roomId, ticket}) => {
@@ -91,9 +98,9 @@ module.exports = (io, rooms) => ({
     }
   },
 
-  vote: (socket, {roomId, vote}) => {
+  vote: (socket, {roomId, vote, userId}) => {
     if (!rooms[roomId]) return;
-    rooms[roomId].votes[socket.id] = vote;
+    rooms[roomId].votes[userId] = vote;
 
     const room = rooms[roomId];
 
@@ -114,16 +121,16 @@ module.exports = (io, rooms) => ({
     refreshRooms(rooms, io);
   },
 
-  leaveRoomVoter: (socket, {roomId}) => {
-    let found = removeVoterFromRoom(rooms, roomId, socket);
+  leaveRoomVoter: (socket, {roomId, userId}) => {
+    let found = removeVoterFromRoom(rooms, roomId, userId);
     if (found) {
       socket.leave(roomId);
       io.to(roomId).emit("voterUpdate", rooms[roomId].voters);
     }
   },
 
-  leaveRoomViewer: (socket, {roomId}) => {
-    let found = removeViewerFromRoom(rooms, roomId, socket);
+  leaveRoomViewer: (socket, {roomId, userId}) => {
+    let found = removeViewerFromRoom(rooms, roomId, userId);
     console.log(found);
     if (found) {
       console.log("Voter leave viewer viewer:", rooms[roomId]);
@@ -151,12 +158,7 @@ module.exports = (io, rooms) => ({
     for (const roomId of Object.keys(rooms)) {
       console.log("Looking for:", socket.id, " in ", rooms[roomId]);
 
-      let found = removeVoterFromRoom(rooms, roomId, socket);
-      console.log("Found voter: ", found);
-      if (!found) {
-        found = removeViewerFromRoom(rooms, roomId, socket);
-        console.log("Found viewer: ", found);
-      }
+      let found = removeUserBySocketId(rooms, roomId, socket.id);
 
       if (found) {
         io.to(roomId).emit("roomUpdate", rooms[roomId]);
