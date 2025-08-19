@@ -2,26 +2,23 @@ import {useRoom} from "../contexts/RoomContext";
 
 export function RoomControls() {
   const {
-    room, getUserId, makeMeDealer,
+    room,
     closeRoom,
     leaveRoomVoter, leaveRoomViewer,
+    isCurrentUserDealer,
+    isCurrentUserViewer
   } = useRoom();
 
   if (!room) {
     return null;
   }
 
-  const isDealer = isUserDealer(getUserId());
-  const isViewer = !!room?.viewers?.[getUserId()];
-
-  function isUserDealer(userId) {
-    return room.dealer === userId;
-  }
+  const isDealer = isCurrentUserDealer();
 
   return (
     <div className="header-controls">
         {!isDealer && (
-          <button className="leave-button" onClick={isViewer ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
+          <button className="leave-button" onClick={isCurrentUserViewer() ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
         )}
 
         {/*{isViewer && !isDealer && (*/}

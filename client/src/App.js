@@ -7,16 +7,18 @@ import {RoomControls} from "./components/roomControls";
 
 function App() {
   const {room, roomId} = useRoom();
-  const dealer = room && room.dealer && room.viewers[room.dealer] ? room.viewers[room.dealer] : "";
+  const dealer = room && room.dealer ? room.dealer : "";
+
   let element = room ? <Room /> : <Lobby />;
   return (
     <div className="App">
       <div className="App-header">
         <h1 className="App-title">Scrum Poker</h1>
+
         { room && (
           <div className="room-title">
             <h2>{roomId}</h2>
-            <h3>{dealer.name ? "Product Owner - " + dealer.name : "No Product Owner!!"}</h3>
+            <h3>{"Product Owner - " + dealer.name }</h3>
           </div>
         )}
 

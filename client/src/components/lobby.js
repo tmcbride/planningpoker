@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 
 export function Lobby() {
   const {
-    socket, joinRoom, openRoom
+    socket, joinRoom, openRoom, currentUserId
   } = useRoom();
 
   const [availableRooms, setAvailableRooms] = useState([]);
@@ -31,6 +31,11 @@ export function Lobby() {
     getRoomList();
   }, []);
 
+  function isRoomDealer(room) {
+    console.log("Comparing " + room.dealerId + " and " + currentUserId);
+    return room.dealerId === currentUserId;
+  }
+
   return (
     <div className="lobby">
 
@@ -47,9 +52,17 @@ export function Lobby() {
                 <span className="player-count">{room.playerCount} players</span>
               </div>
               <div className="room-actions">
-                Join as:
-                <button onClick={() => joinRoom(room.id)}>Voter</button>
-                <button onClick={() => openRoom(room.id)}>Viewer</button>
+                {isRoomDealer(room) && (
+                  <button onClick={() => openRoom(room.id)}>Open</button>
+                )}
+
+                {!isRoomDealer(room) && (
+                  <div>
+                    Join as:
+                    <button onClick={() => joinRoom(room.id)}>Voter</button>
+                    <button onClick={() => openRoom(room.id)}>Viewer</button>
+                  </div>
+                )}
               </div>
             </div>
           ))}

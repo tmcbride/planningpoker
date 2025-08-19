@@ -9,10 +9,6 @@ export function Viewers() {
     return null;
   }
 
-  function isUserDealer(userId) {
-    return room.dealer === userId;
-  }
-
   if (!room || !room.viewers) {
     return null;
   }
@@ -26,7 +22,7 @@ export function Viewers() {
               .map(([id, user]) => (
                 <li key={id}>
                   <div className="viewer">
-                    <span className="viewer-icon">{isUserDealer(id) ? "🃏" : "👤"}</span>
+                    <span className="viewer-icon">"👤"</span>
                     <div>
                       {user.name}
                     </div>

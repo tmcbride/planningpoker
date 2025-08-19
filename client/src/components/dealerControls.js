@@ -5,7 +5,8 @@ export function DealerControls() {
   const {
     setCurrentTicket,
     resetVotes,
-    room
+    room,
+    isCurrentUserDealer
   } = useRoom();
 
   const [project, setProject] = useState("");
@@ -33,6 +34,10 @@ export function DealerControls() {
     return room.currentTicket && room.currentTicket.key === ticketKey;
   }
 
+  if (!isCurrentUserDealer()) {
+    return null;
+  }
+
   return (
     <div className="dealer-controls">
       <select
@@ -57,14 +62,12 @@ export function DealerControls() {
         ) : (
           ticketList.map(ticket => (
             <div key={ticket.key} className="ticket-list-info">
-
               <div className={
                 "ticket-card ticket-list-card  " +
                 (isCurrentTicket(ticket.key) ? "selected-ticket" : "")
               }
                    onClick={() => setCurrentTicket(ticket)}>
                 <h4>{ticket.key} - {ticket.title}</h4>
-                {/*<p>{ticket.description}</p>*/}
               </div>
             </div>
           ))

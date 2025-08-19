@@ -5,10 +5,26 @@ import { useRef } from "react";
 const RoomContext = createContext();
 export const useRoom = () => useContext(RoomContext);
 
+function loadOrGenerateUserId() {
+  let userId = localStorage.getItem("userId");
+  if (!userId) {
+    userId = randomId();
+    localStorage.setItem("userId", userId);
+  }
+
+  return userId;
+}
+
+function randomId(length = 8) {
+  return Math.random().toString(36).substring(2, 2 + length);
+}
+
 export function RoomProvider({children}) {
   const [room, setRoom] = useState(null);
   const [name, setName] = useState(localStorage.getItem("name"));
   const [roomId, setRoomId] = useState("");
+  let initialState = loadOrGenerateUserId();
+  const [currentUserId, setUserId] = useState(initialState);
   const [ticket, setTicket] = useState(null);
 
   const socketRef = useRef(null);
@@ -18,10 +34,6 @@ export function RoomProvider({children}) {
   }
 
   const socket = socketRef.current;
-
-  function getUserId() {
-    return socket.id;
-  }
 
   useEffect(() => {
     localStorage.setItem("name", name);
@@ -68,8 +80,8 @@ export function RoomProvider({children}) {
   }, [socket]);
 
   const createRoom = () => {
-    if (!roomId || !name) return alert("Enter name & room ID");
-    socket.emit("createRoom", { roomId, name: name });
+    if (!roomId || !name) return alert("Enter name & Sprint Name");
+    socket.emit("createRoom", { roomId: roomId, name: name, userId: currentUserId });
   };
 
   const makeMeDealer = () => {
@@ -134,7 +146,6 @@ export function RoomProvider({children}) {
   //   }
   // }, []);
 
-  // Dealer actions
   const setCurrentTicket = (ticket) => {
     if (!ticket) return alert("Enter a ticket");
     socket.emit("setTicket", { roomId, ticket: ticket });
@@ -144,10 +155,24 @@ export function RoomProvider({children}) {
     socket.emit("resetVotes", { roomId });
   };
 
-  // Player actions
   const vote = (value) => {
     socket.emit("vote", { roomId, vote: value });
   };
+
+  const isCurrentUserViewer = () => !!room?.viewers?.[currentUserId];
+
+  const isUserDealer = (userId) => {
+    console.log(
+      "currentUserId:", currentUserId, typeof currentUserId,
+      "dealerId:", room?.dealer?.userId, typeof room?.dealer?.userId,
+      "equal?:", currentUserId === room?.dealer?.userId
+    );
+    return room && room.dealer && room.dealer.userId === userId;
+  }
+
+  const isCurrentUserDealer = () => {
+    return isUserDealer(currentUserId);
+  }
 
   return (
     <RoomContext.Provider
@@ -169,10 +194,13 @@ export function RoomProvider({children}) {
         setCurrentTicket,
         resetVotes,
         vote,
-        getUserId,
+        currentUserId,
         makeMeDealer,
         closeRoom,
-        socket
+        socket,
+        isUserDealer,
+        isCurrentUserDealer,
+        isCurrentUserViewer
       }}
     >
       {children}

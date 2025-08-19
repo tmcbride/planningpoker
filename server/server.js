@@ -56,7 +56,8 @@ io.on("connection", (socket) => {
 app.get("/rooms", (req, res) => {
   const roomList = Object.keys(rooms).map(roomId => ({
     id: roomId,
-    playerCount: Object.values(rooms[roomId].voters).length
+    playerCount: Object.values(rooms[roomId].voters).length,
+    dealerId: rooms[roomId].dealer.userId
   }));
 
   res.json(roomList);
