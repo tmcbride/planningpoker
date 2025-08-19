@@ -9,8 +9,10 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
+let rooms = {};
+
 // serve API routes first (before static)
-app.use("/api", require("./routes"));
+app.use("/api", require("./routes")(rooms));
 
 // // serve frontend
 // app.use(express.static(path.join(__dirname, "../client/build")));
@@ -31,7 +33,6 @@ const io = new Server(server, {
 });
 
 const ROOMS_KEY = "rooms";
-let rooms = {};
 let handlers;
 
 async function saveRooms() {
@@ -61,51 +62,6 @@ io.on("connection", (socket) => {
   socket.on("leaveRoomVoter", (data) => handlers.leaveRoomVoter(socket, data));
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));
   socket.on("makeMeDealer", (data) => handlers.makeMeDealer(socket, data));
-});
-
-app.get("/rooms", (req, res) => {
-  const roomList = Object.keys(rooms).map(roomId => ({
-    id: roomId,
-    playerCount: Object.values(rooms[roomId].voters).length
-  }));
-
-  res.json(roomList);
-});
-
-app.get("/tickets/:projectId", (req, res) => {
-  fs.readFile(file, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading JSON file:', err);
-      return;
-    }
-
-    try {
-      const jsonData = JSON.parse(data);
-      console.log('Parsed JSON data:', jsonData);
-      let resp = jsonData.hasOwnProperty(req.params.projectId) ? jsonData[req.params.projectId] : [];
-      res.json(resp);
-    } catch (parseError) {
-      console.error('Error parsing JSON:', parseError);
-    }
-  });
-});
-
-app.get("/projects", (req, res) => {
-  fs.readFile(file, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading JSON file:', err);
-      return;
-    }
-
-    try {
-      const jsonData = JSON.parse(data);
-      console.log('Parsed JSON data:', jsonData);
-      let resp = Object.keys(jsonData);
-      res.json(resp);
-    } catch (parseError) {
-      console.error('Error parsing JSON:', parseError);
-    }
-  });
 });
 
 // // ---------- Initialize storage ----------
