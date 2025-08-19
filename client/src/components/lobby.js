@@ -29,8 +29,8 @@ export function Lobby() {
     }, [apiUrl]);
 
   function isRoomDealer(room) {
-    console.log("Comparing " + room.dealerId + " and " + currentUserId);
-    return room.dealerId === currentUserId;
+    console.log("Comparing ", room, " and ", currentUserId);
+    return room.dealerId && room.dealerId === currentUserId;
   }
 
   return (

@@ -12,18 +12,23 @@ module.exports = (rooms) => {
   router.get("/rooms", (req, res) => {
     const roomList = Object.keys(rooms).map(roomId => ({
       id: roomId,
-      playerCount: Object.values(rooms[roomId].voters).length
+      playerCount: Object.values(rooms[roomId].voters).length,
+      dealerId: rooms[roomId].dealer?.userId,
     }));
 
     res.json(roomList);
   });
 
   router.get("/tickets/:projectId", async (req, res) => {
-    const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/backlog?maxResults=10`; //&jql=fixVersion=${req.params.fixVersion}`;
-    console.log(jiraUrl);
+    const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/backlog?maxResults=100`; //&jql=fixVersion=${req.params.fixVersion}`;
     let data = await makeJiraCall(jiraUrl);
-    console.log(data);
-    res.json(data);
+    const mappedTickets = data.issues.map(issue => ({
+      key: issue.key,
+      title: issue.fields.summary,
+      description: issue.fields.description,
+      storyPoints: issue.fields.customfield_10003
+    }));
+    res.json(mappedTickets);
   });
 
   async function makeJiraCall(jiraUrl) {

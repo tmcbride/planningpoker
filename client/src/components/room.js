@@ -17,8 +17,8 @@ export function Room() {
         <div className="ticket-info">
           {room.currentTicket ? (
             <div className="ticket-card ticket-display">
-                <h4><a href={`https://expanse.emhsupport.com/browse/${room.currentTicket.key}`} target="jira">{room.currentTicket.key}</a> - {room.currentTicket.fields.summary}</h4>
-                <pre className="ticket-display-pre">{room.currentTicket.fields.description}</pre>
+                <h4><a href={`https://expanse.emhsupport.com/browse/${room.currentTicket.key}`} target="jira">{room.currentTicket.key}</a> - {room.currentTicket.title}</h4>
+                <pre className="ticket-display-pre">{room.currentTicket.description}</pre>
             </div>
           ) : (
             <p>No ticket selected</p>

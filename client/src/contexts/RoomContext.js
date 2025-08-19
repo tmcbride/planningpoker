@@ -28,10 +28,10 @@ export function RoomProvider({children}) {
   const [ticket, setTicket] = useState(null);
 
   const socketRef = useRef(null);
-  // const apiUrl = process.env.REACT_APP_SOCKET_URL;
+  const apiUrl = process.env.REACT_APP_SOCKET_URL || "";
 
   if (!socketRef.current) {
-    socketRef.current = io();
+    socketRef.current = io(apiUrl);
   }
 
   const socket = socketRef.current;
@@ -66,6 +66,12 @@ export function RoomProvider({children}) {
     const handleVoterUpdate = (data) => setRoom(prev => prev ? ({ ...prev, voters: data }) : prev);
     socket.on("voterUpdate", handleVoterUpdate);
     return () => socket.off("voterUpdate", handleVoterUpdate);
+  }, [socket]);
+
+  useEffect(() => {
+    const handleTicketUpdate = (data) => setRoom(prev => prev ? ({ ...prev, currentTicket: data, showVotes: false, votes: {} }) : prev);
+    socket.on("ticketUpdate", handleTicketUpdate);
+    return () => socket.off("ticketUpdate", handleTicketUpdate);
   }, [socket]);
 
   useEffect(() => {

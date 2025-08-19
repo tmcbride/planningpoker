@@ -15,6 +15,8 @@ export function DealerControls() {
     const [boardList, setBoardList] = useState([]);
     const [ticketList, setTicketList] = useState([]);
     const apiUrl = process.env.REACT_APP_API_URL;
+    const [hideWithStoryPoints, setHideWithStoryPoints] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     // Fetch projects from the server when component mounts
     useEffect(() => {
@@ -27,30 +29,34 @@ export function DealerControls() {
             .catch((err) => console.error("Error fetching projects:", err));
     }, []);
 
+    // useEffect(() => {
+    //     console.log("Trying to call ", board?.id);
+    //     if (!board || !board.id) return;
+    //     console.log("Tringgering call to ", board);
+    //     fetch(`${apiUrl}/api/projectList/${board.id}`)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             console.log(data);
+    //             setProjectVersionList(data);
+    //         })
+    //         .catch(err => console.error("Error fetching rooms:", err));
+    // }, [board]);
+
     useEffect(() => {
-        console.log("Trying to call ", board?.id);
-        if (!board || !board.id) return;
-        console.log("Tringgering call to ", board);
-        fetch(`${apiUrl}/api/projectList/${board.id}`)
-            .then(res => res.json())
-            .then(data => {
-                console.log(data);
-                setProjectVersionList(data);
-            })
-            .catch(err => console.error("Error fetching rooms:", err));
-    }, [board]);
+        if (!board) return;
 
-    function getTicketList() {
-        console.log("Getting tickets list board", board?.id, " Project", projectVersion);
-
+        setLoading(true);
         fetch(`${apiUrl}/api/tickets/${board.id}/${projectVersion}`)
             .then(res => res.json())
             .then(data => {
-                console.log("Tickets", data);
-                setTicketList(data.issues);
+                setTicketList(data);
+                setLoading(false);
             })
-            .catch(err => console.error("Error fetching rooms:", err));
-    }
+            .catch(err => {
+                console.error("Error fetching rooms:", err);
+                setLoading(false);
+            });
+    }, [board]);
 
     function isCurrentTicket(ticketKey) {
         return room.currentTicket && room.currentTicket.key === ticketKey;
@@ -59,6 +65,10 @@ export function DealerControls() {
     if (!isCurrentUserDealer()) {
         return null;
     }
+
+    const filteredTickets = hideWithStoryPoints
+        ? ticketList.filter(ticket => !ticket.storyPoints && ticket.storyPoints !== 0)
+        : ticketList;
 
     return (
         <div className="dealer-controls">
@@ -76,33 +86,36 @@ export function DealerControls() {
                     </option>
                 ))}
             </select>
-            {/*<select*/}
-            {/*    value={projectVersion}*/}
-            {/*    onChange={e => setProjectVersion(e.target.value)}*/}
-            {/*>*/}
-            {/*    <option value="">Select a Project Version</option>*/}
-            {/*    {Array.isArray(projectVersionList) && projectVersionList.map((project) => (*/}
-            {/*        <option key={project.id} value={project.name}>*/}
-            {/*            {project.name}*/}
-            {/*        </option>*/}
-            {/*    ))}*/}
-            {/*</select>*/}
-            <div className="dealer-controls-buttons">
-                <button onClick={getTicketList}>Search Tickets</button>
-                <button onClick={resetVotes}>Reset Votes</button>
-            </div>
+            <label className="styled-checkbox-label">
+                <input
+                    type="checkbox"
+                    checked={hideWithStoryPoints}
+                    onChange={e => setHideWithStoryPoints(e.target.checked)}
+                />
+                Hide tickets with story points
+            </label>
+            {/*<div className="dealer-controls-buttons">*/}
+            {/*    <button onClick={getTicketList}>Search Tickets</button>*/}
+            {/*    <button onClick={resetVotes}>Reset Votes</button>*/}
+            {/*</div>*/}
             <div className="ticket-list">
-                {ticketList.length === 0 ? (
+                {loading ? (
+                    <div className="loading-indicator">
+                        <span className="loading-spinner"></span>
+                        Loading tickets...
+                    </div>
+                ) : !filteredTickets || filteredTickets.length === 0 ? (
                     <p>No tickets loaded</p>
                 ) : (
-                    Array.isArray(ticketList) && ticketList.map(ticket => (
+                    Array.isArray(filteredTickets) && filteredTickets.map(ticket => (
                         <div key={ticket.key} className="ticket-list-info">
                             <div className={
                                 "ticket-card ticket-list-card  " +
                                 (isCurrentTicket(ticket.key) ? "selected-ticket" : "")
                             }
                                  onClick={() => setCurrentTicket(ticket)}>
-                                <h4>{ticket.key} - {ticket.fields.summary}</h4>
+                                <h4>{ticket.key} - {ticket.title}</h4>
+                                {ticket.storyPoints ? <h5>Story Points: {ticket.storyPoints}</h5> : ""}
                             </div>
                         </div>
                     ))

@@ -91,10 +91,8 @@ module.exports = (io, rooms) => ({
   setTicket: ({roomId, ticket}) => {
     if (rooms[roomId]) {
       rooms[roomId].currentTicket = ticket;
-      rooms[roomId].votes = {};
-      rooms[roomId].showVotes = false;
 
-      io.to(roomId).emit("roomUpdate", rooms[roomId]);
+      io.to(roomId).emit("ticketUpdate", rooms[roomId].currentTicket);
     }
   },
 

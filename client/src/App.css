@@ -111,6 +111,21 @@
     flex-direction: row;
 }
 
+.styled-checkbox-label {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    gap: 0.5em;
+    margin-bottom: 0.3rem;
+}
+
+.styled-checkbox-label input[type="checkbox"] {
+    width: 1.2em;
+    height: 1.2em;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
 .room {
     display: flex;
     flex-direction: row;
@@ -422,14 +437,11 @@ input:disabled {
     flex-direction: column;
 }
 
-.ticket-display p {
+.ticket-display-pre {
     flex-grow: 1;
     flex-shrink: 1;
     overflow-y: auto;
     margin: 0.5rem 0;
-}
-
-.ticket-display-pre {
     white-space: pre-wrap;
     word-break: break-word;
 }
@@ -552,4 +564,24 @@ input:disabled {
         transform: scale(1.8);
         opacity: 0;
     }
+}
+
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 1em;
+}
+
+.loading-spinner {
+    width: 1em;
+    height: 1em;
+    border: 2px solid #ccc;
+    border-top: 2px solid var(--primary, #007bff);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
