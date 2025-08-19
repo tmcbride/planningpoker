@@ -22,16 +22,16 @@ function randomId(length = 12) {
 export function RoomProvider({children}) {
   const [room, setRoom] = useState(null);
   const [name, setName] = useState(localStorage.getItem("name"));
-  const [roomId, setRoomId] = useState(localStorage.getItem("name"));
+  const [roomId, setRoomId] = useState(localStorage.getItem("roomId"));
   let initialState = loadOrGenerateUserId();
   const [currentUserId] = useState(initialState);
   const [ticket, setTicket] = useState(null);
 
   const socketRef = useRef(null);
-  const apiUrl = process.env.REACT_APP_API_URL;
+  // const apiUrl = process.env.REACT_APP_SOCKET_URL;
 
   if (!socketRef.current) {
-    socketRef.current = io(apiUrl);
+    socketRef.current = io();
   }
 
   const socket = socketRef.current;
