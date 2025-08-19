@@ -5,7 +5,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const getHandlers = require("./socketHandlers");
 const cors = require("cors");
-
+const path = require("path");
 const PORT = process.env.PORT || 4000;
 
 const app = express();
@@ -16,16 +16,19 @@ let rooms = {};
 // serve API routes first (before static)
 app.use("/api", require("./routes")(rooms));
 
-// // serve frontend
-// app.use(express.static(path.join(__dirname, "../client/build")));
-//
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "../client/build/index.html"));
-// });
 
-// app.listen(process.env.PORT || 4000, () => {
-//   console.log("Server running...");
-// });
+// Serve static files from React build
+let clientPath = path.join(__dirname, "../client/build");
+console.log(clientPath);
+let clientIndex = path.join(clientPath, "./index.html");
+console.log(clientIndex);
+
+app.use(express.static(clientPath));
+
+// For any other route, send back React's index.html
+app.get("/", (req, res) => {
+  res.sendFile(clientIndex);
+});
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -42,6 +45,8 @@ async function clearRooms() {
   await saveRooms();
   handlers.requestRooms(io);
 }
+
+handlers = getHandlers(io, rooms);
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
@@ -60,6 +65,5 @@ io.on("connection", (socket) => {
   socket.on("openRoom", (data) => handlers.openRoom(socket, data));
 });
 
-handlers = getHandlers(io, rooms);
 
 server.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
