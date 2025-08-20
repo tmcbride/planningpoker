@@ -26,7 +26,8 @@ module.exports = (rooms) => {
       key: issue.key,
       title: issue.fields.summary,
       description: issue.fields.description,
-      storyPoints: issue.fields.customfield_10003
+      storyPoints: issue.fields.customfield_10003,
+      link: `${process.env.BASE_JIRA_URL}/browse/${issue.key}`
     }));
     res.json(mappedTickets);
   });

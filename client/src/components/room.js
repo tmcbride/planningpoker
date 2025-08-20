@@ -5,7 +5,7 @@ import {DealerControls} from "./dealerControls";
 
 export function Room() {
   const {
-    room, isCurrentUserDealer
+    room
   } = useRoom();
 
   return (
@@ -17,7 +17,7 @@ export function Room() {
         <div className="ticket-info">
           {room.currentTicket ? (
             <div className="ticket-card ticket-display">
-                <h4><a href={`https://expanse.emhsupport.com/browse/${room.currentTicket.key}`} target="jira">{room.currentTicket.key}</a> - {room.currentTicket.title}</h4>
+                <h4><a href={room.currentTicket.link} target="jira">{room.currentTicket.key}</a> - {room.currentTicket.title}</h4>
                 <pre className="ticket-display-pre">{room.currentTicket.description}</pre>
             </div>
           ) : (
