@@ -5,7 +5,9 @@ FROM node:18
 WORKDIR /app
 
 # Copy the rest of your code
-COPY . .
+RUN git clone https://github.com/tmcbride/planningpoker.git
+
+WORKDIR /app/planningpoker
 
 # Install dependencies
 RUN npm install
