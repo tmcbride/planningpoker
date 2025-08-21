@@ -59,7 +59,7 @@ export function Votes() {
 
   return (
     <div>
-      {showFireworks && <div className="firework"></div>}
+      {/*{showFireworks && <div className="firework"></div>}*/}
       <div className="cards">
         {room && room.voters && Object.entries(room.voters)
             .filter(([id, voter]) => id !== undefined && !voter.removed)

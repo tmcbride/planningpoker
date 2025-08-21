@@ -14,7 +14,7 @@ function App() {
         <div className="app">
             <div className="app-header">
                 <div className="app-header-container">
-                    <h1 className="app-title">Scrum Poker</h1>
+                    <h1 className="app-title">Scrum Poker - Beta</h1>
 
                     {room && (
                         <div className="app-room-title">
