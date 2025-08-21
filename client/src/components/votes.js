@@ -9,7 +9,7 @@ export function Votes() {
 
   useEffect(() => {
     if (room.showVotes) {
-      const votes = Object.values(room.votes).filter(v => v !== undefined);
+      const votes = getVotes();
       if (votes.length > 1) {
         const first = votes[0];
         if (votes.every(v => v === first)) {
@@ -21,12 +21,16 @@ export function Votes() {
     }
   }, [room.showVotes, room.votes]);
 
+  function getVotes() {
+    return Object.values(room.votes).filter(v => v !== undefined);
+  }
+
   const mostCommonVote = useMemo(() => {
     if (!room.votes || !room.showVotes) {
       return null;
     }
 
-    const votes = Object.values(room.votes).filter(v => v !== undefined);
+    const votes = getVotes();
     if (votes.length < 3) {
       const first = votes[0];
       if (votes.every(v => v === first)) {
@@ -58,6 +62,7 @@ export function Votes() {
       {showFireworks && <div className="firework"></div>}
       <div className="cards">
         {room && room.voters && Object.entries(room.voters)
+            .filter(([id, voter]) => id !== undefined && !voter.removed)
           .map(([id, voter]) => {
             if (!room) return;
             const voteValue = room.votes[id];

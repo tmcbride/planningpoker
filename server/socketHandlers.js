@@ -6,8 +6,12 @@ function removeVoterFromRoom(rooms, roomId, userId) {
   if (r.voters && r.voters[userId]) {
     console.log("Removing voter:", userId, "from room:", roomId);
 
-    delete r.voters[userId];
-    delete r.votes[userId];
+    if (r.voters[userId]) {
+      r.voters[userId].removed = true;
+    }
+    if (r?.votes[userId]) {
+      r.votes[userId].removed = true;
+    }
     found = true;
   }
 
@@ -70,7 +74,7 @@ module.exports = (io, rooms) => ({
 
     if (!rooms[roomId]) return;
     socket.join(roomId);
-    rooms[roomId].voters[userId] = {name, userId, socketId: socket.id};
+    rooms[roomId].voters[userId] = {name, userId, socketId: socket.id, removed: false};
 
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
     socket.emit("roomUpdate", rooms[roomId]);
@@ -82,7 +86,7 @@ module.exports = (io, rooms) => ({
     let room = rooms[roomId];
     if (!room) return;
     socket.join(roomId);
-    room.viewers[userId] = {name, userId, socketId: socket.id};
+    room.viewers[userId] = {name, userId, socketId: socket.id, removed: false};
 
     io.to(roomId).emit("roomUpdate", room);
     socket.emit("roomUpdate", room);
@@ -91,6 +95,7 @@ module.exports = (io, rooms) => ({
   setTicket: ({roomId, ticket}) => {
     if (rooms[roomId]) {
       rooms[roomId].currentTicket = ticket;
+      rooms[roomId].votes = {};
 
       io.to(roomId).emit("ticketUpdate", rooms[roomId].currentTicket);
     }
@@ -104,13 +109,10 @@ module.exports = (io, rooms) => ({
 
     // Check if all players have voted
     const playerIds = Object.entries(room.voters)
+        .filter(([id, voter]) => !voter.removed)
       .map(([id]) => id);
 
-    const allVoted = playerIds.every(id => room.votes[id] !== undefined);
-
-    if (allVoted) {
-      room.showVotes = true;
-    }
+    room.showVotes = playerIds.every(id => room.votes[id] !== undefined);
 
     io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes});
   },

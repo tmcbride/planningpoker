@@ -4,21 +4,18 @@ import {useState, useEffect} from "react";
 export function DealerControls() {
     const {
         setCurrentTicket,
-        resetVotes,
         room,
         isCurrentUserDealer
     } = useRoom();
 
     const [board, setBoard] = useState(null);
     const [projectVersion, setProjectVersion] = useState("");
-    const [projectVersionList, setProjectVersionList] = useState([]);
     const [boardList, setBoardList] = useState([]);
     const [ticketList, setTicketList] = useState([]);
     const apiUrl = process.env.REACT_APP_API_URL;
     const [hideWithStoryPoints, setHideWithStoryPoints] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    // Fetch projects from the server when component mounts
     useEffect(() => {
         fetch(`${apiUrl}/api/projects`)
             .then((res) => res.json())
@@ -28,19 +25,6 @@ export function DealerControls() {
             })
             .catch((err) => console.error("Error fetching projects:", err));
     }, []);
-
-    // useEffect(() => {
-    //     console.log("Trying to call ", board?.id);
-    //     if (!board || !board.id) return;
-    //     console.log("Tringgering call to ", board);
-    //     fetch(`${apiUrl}/api/projectList/${board.id}`)
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             console.log(data);
-    //             setProjectVersionList(data);
-    //         })
-    //         .catch(err => console.error("Error fetching rooms:", err));
-    // }, [board]);
 
     useEffect(() => {
         if (!board) return;
@@ -94,10 +78,6 @@ export function DealerControls() {
                 />
                 Hide tickets with story points
             </label>
-            {/*<div className="dealer-controls-buttons">*/}
-            {/*    <button onClick={getTicketList}>Search Tickets</button>*/}
-            {/*    <button onClick={resetVotes}>Reset Votes</button>*/}
-            {/*</div>*/}
             <div className="ticket-list">
                 {loading ? (
                     <div className="loading-indicator">

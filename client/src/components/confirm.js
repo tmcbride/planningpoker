@@ -19,6 +19,5 @@ export function Dialog({open, message, onConfirm, onCancel}) {
                 </div>
             </div>
         </div>
-    )
-        ;
+    );
 }

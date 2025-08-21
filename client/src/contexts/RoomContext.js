@@ -41,10 +41,6 @@ export function RoomProvider({children}) {
   }, [name]);
 
   useEffect(() => {
-    localStorage.setItem("roomId", roomId);
-  }, [roomId]);
-
-  useEffect(() => {
     const handleRoomUpdate = (data) => setRoom(data);
     socket.on("roomUpdate", handleRoomUpdate);
     return () => socket.off("roomUpdate", handleRoomUpdate);
@@ -63,7 +59,10 @@ export function RoomProvider({children}) {
   }, [socket]);
 
   useEffect(() => {
-    const handleVoterUpdate = (data) => setRoom(prev => prev ? ({ ...prev, voters: data }) : prev);
+    const handleVoterUpdate = (data) => {
+      setRoom(prev => prev ? ({...prev, voters: data}) : prev);
+      console.log(data);
+    }
     socket.on("voterUpdate", handleVoterUpdate);
     return () => socket.off("voterUpdate", handleVoterUpdate);
   }, [socket]);
@@ -92,6 +91,7 @@ export function RoomProvider({children}) {
 
   const createRoom = () => {
     if (!roomId || !name) return alert("Enter name & Sprint Name");
+    localStorage.setItem("roomIdDealer", roomId);
     socket.emit("createRoom", { roomId: roomId, name: name, userId: currentUserId });
   };
 
@@ -106,9 +106,7 @@ export function RoomProvider({children}) {
   const joinRoom = (roomIdToJoin) => {
     if (!roomIdToJoin || !name) return alert("Enter name");
 
-    // Save locally
-    // localStorage.setItem("username", name);
-    // localStorage.setItem("roomId", roomIdToJoin);
+    localStorage.setItem("roomId", roomIdToJoin);
 
     socket.emit("joinRoom", { roomId: roomIdToJoin, name: name, userId: currentUserId });
     setRoomId(roomIdToJoin);
@@ -117,41 +115,47 @@ export function RoomProvider({children}) {
   const openRoom = async (roomIdToJoin) => {
     if (!roomIdToJoin || !name) return alert("Enter name");
 
-    // localStorage.setItem("roomId", roomIdToJoin);
+    localStorage.setItem("roomIdViewer", roomIdToJoin);
     socket.emit("openRoom", { roomId: roomIdToJoin, name: name, userId: currentUserId});
     setRoomId(roomIdToJoin);
   };
 
   const leaveRoomVoter = () => {
     socket.emit("leaveRoomVoter", { roomId, userId: currentUserId });
-    setRoom(null);
-    setRoomId("");
-    // localStorage.removeItem("roomId");
+    leaveRoom();
   };
 
   const leaveRoomViewer = () => {
     socket.emit("leaveRoomViewer", { roomId, userId: currentUserId });
-    setRoom(null);
-    setRoomId("");
-    // localStorage.removeItem("roomId");
+    leaveRoom();
   };
 
   const leaveRoom = () => {
     setRoom(null);
     setRoomId("");
-    // localStorage.removeItem("roomId");
+    localStorage.removeItem("roomId");
+    localStorage.removeItem("roomIdViewer");
+    localStorage.removeItem("roomIdDealer");
   };
 
-  // useEffect(() => {
-  //   const savedName = localStorage.getItem("username");
-  //   const savedRoom = localStorage.getItem("roomId");
-  //
-  //   if (savedName && savedRoom) {
-  //     setName(savedName);
-  //     setRoomId(savedRoom);
-  //     socket.emit("joinRoom", { roomId: savedRoom, name: savedName });
-  //   }
-  // }, []);
+  useEffect(() => {
+    const savedName = localStorage.getItem("name");
+    const savedRoom = localStorage.getItem("roomId");
+    const savedRoomViewer = localStorage.getItem("roomIdViewer");
+    const roomIdDealer = localStorage.getItem("roomIdDealer");
+
+    if (savedName && (roomIdDealer || savedRoom || savedRoomViewer)) {
+      setName(savedName);
+      if (savedRoom) {
+        setRoomId(savedRoom);
+        socket.emit("joinRoom", { roomId: savedRoom, name: savedName, userId: currentUserId });
+      }
+      else {
+        setRoomId(savedRoomViewer);
+        socket.emit("openRoom", { roomId: savedRoomViewer, name: savedName, userId: currentUserId });
+      }
+    }
+  }, []);
 
   const setCurrentTicket = (ticket) => {
     if (!ticket) return alert("Enter a ticket");

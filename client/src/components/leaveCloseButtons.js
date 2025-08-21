@@ -32,7 +32,7 @@ export function LeaveCloseButtons() {
 
                     <Dialog
                         open={modalOpen}
-                        message="Are you sure you want to close this modal for everyone?"
+                        message="Are you sure you want to close this room for everyone?"
                         onConfirm={() => {
                             closeRoom();
                             setModalOpen(false); /* your action */
