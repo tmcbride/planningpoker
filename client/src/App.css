@@ -93,12 +93,15 @@ input:disabled {
     width: 20%;
     justify-content: left;
     display: flex;
-    /*margin-left: 2rem;*/
+    flex-direction: column;
+}
+
+.app-title h3 {
+    margin-top: 0;
 }
 
 .app-button {
     width: 20%;
-    /*margin-right: 2rem;*/
 }
 
 @media (prefers-reduced-motion: no-preference) {
