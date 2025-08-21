@@ -2,7 +2,7 @@ import {useRoom} from "../contexts/RoomContext";
 import {Dialog} from "./confirm";
 import {useState} from "react";
 
-export function RoomControls() {
+export function LeaveCloseButtons() {
     const {
         room,
         closeRoom,
@@ -20,7 +20,7 @@ export function RoomControls() {
     const isDealer = isCurrentUserDealer();
 
     return (
-        <div className="header-controls">
+        <div className="App-button">
             {!isDealer && (
                 <button className="leave-button"
                         onClick={isCurrentUserViewer() ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
