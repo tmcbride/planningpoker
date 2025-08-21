@@ -17,8 +17,10 @@
 }
 
 .App-title {
-    width: 20vw;
+    /*width: 20vw;*/
     padding-left: 2vw;
+    justify-content: center;
+    display: flex;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -584,4 +586,34 @@ input:disabled {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    min-width: 300px;
+    text-align: center;
+    color:black;
+}
+
+.modal-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.modal-btn:hover {
+    background: #1565c0;
 }

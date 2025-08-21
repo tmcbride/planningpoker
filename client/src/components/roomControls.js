@@ -1,34 +1,47 @@
 import {useRoom} from "../contexts/RoomContext";
+import {Dialog} from "./confirm";
+import {useState} from "react";
 
 export function RoomControls() {
-  const {
-    room,
-    closeRoom,
-    leaveRoomVoter, leaveRoomViewer,
-    isCurrentUserDealer,
-    isCurrentUserViewer
-  } = useRoom();
+    const {
+        room,
+        closeRoom,
+        leaveRoomVoter, leaveRoomViewer,
+        isCurrentUserDealer,
+        isCurrentUserViewer
+    } = useRoom();
 
-  if (!room) {
-    return null;
-  }
+    const [modalOpen, setModalOpen] = useState(false);
 
-  const isDealer = isCurrentUserDealer();
+    if (!room) {
+        return null;
+    }
 
-  return (
-    <div className="header-controls">
-        {!isDealer && (
-          <button className="leave-button" onClick={isCurrentUserViewer() ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
-        )}
+    const isDealer = isCurrentUserDealer();
 
-        {isDealer && (
-          <button className="leave-button" onClick={() => {
-            if (window.confirm("Are you sure you want to close the room for everyone?")) {
-              closeRoom();
-            }
-          }}>Close Room</button>
-        )}
-    </div>
+    return (
+        <div className="header-controls">
+            {!isDealer && (
+                <button className="leave-button"
+                        onClick={isCurrentUserViewer() ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
+            )}
 
-  )
+            {isDealer && (
+                <div>
+                    <button className="leave-button" onClick={() => setModalOpen(true)}>Close Room</button>
+
+                    <Dialog
+                        open={modalOpen}
+                        message="Are you sure you want to close this modal for everyone?"
+                        onConfirm={() => {
+                            closeRoom();
+                            setModalOpen(false); /* your action */
+                        }}
+                        onCancel={() => setModalOpen(false)}
+                    />
+                </div>
+            )}
+        </div>
+
+    )
 }
