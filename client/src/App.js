@@ -11,13 +11,13 @@ function App() {
 
     let element = room ? <Room/> : <Lobby/>;
     return (
-        <div className="App">
-            <div className="App-header">
-                <div className="App-header-container">
-                    <h1 className="App-title">Scrum Poker</h1>
+        <div className="app">
+            <div className="app-header">
+                <div className="app-header-container">
+                    <h1 className="app-title">Scrum Poker</h1>
 
                     {room && (
-                        <div className="room-title">
+                        <div className="app-room-title">
                             <h2>{roomId}</h2>
                             <h3>{"Product Owner - " + dealer.name}</h3>
                         </div>
@@ -26,7 +26,7 @@ function App() {
                     <LeaveCloseButtons/>
                 </div>
             </div>
-            <div className="App-content">
+            <div className="app-content">
                 {!room && (<NameInput/>)}
                 {element}
             </div>

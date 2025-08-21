@@ -20,15 +20,15 @@ export function LeaveCloseButtons() {
     const isDealer = isCurrentUserDealer();
 
     return (
-        <div className="App-button">
+        <div className="app-button">
             {!isDealer && (
-                <button className="leave-button"
+                <button className="app-leave-button"
                         onClick={isCurrentUserViewer() ? leaveRoomViewer : leaveRoomVoter}>Leave Room</button>
             )}
 
             {isDealer && (
                 <div>
-                    <button className="leave-button" onClick={() => setModalOpen(true)}>Close Room</button>
+                    <button className="app-leave-button" onClick={() => setModalOpen(true)}>Close Room</button>
 
                     <Dialog
                         open={modalOpen}

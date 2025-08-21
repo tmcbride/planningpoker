@@ -54,16 +54,16 @@ export function Lobby() {
   }
 
   return (
-    <div className="lobby">
+    <div className="room-lobby">
 
-      <div className="roomList">
+      <div className="room-list">
         <div className="room-header">
           <h2>Rooms</h2>
         </div>
         <div>
           {availableRooms.length === 0 && <div>No rooms available</div>}
           {availableRooms.map(room => (
-            <div className="roomRow roomEntry" key={room.id}>
+            <div className="room-row room-entry" key={room.id}>
               <div className="room-info">
                 <strong>{room.id}</strong>
                 <span className="player-count">{room.playerCount} players</span>

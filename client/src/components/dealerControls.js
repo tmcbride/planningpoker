@@ -86,7 +86,7 @@ export function DealerControls() {
                     </option>
                 ))}
             </select>
-            <label className="styled-checkbox-label">
+            <label className="dealer-checkbox-label">
                 <input
                     type="checkbox"
                     checked={hideWithStoryPoints}

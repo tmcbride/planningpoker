@@ -6,253 +6,7 @@
     --text: #333;
 }
 
-.App {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
-}
-
-.App-title {
-    width: 20%;
-    justify-content: left;
-    display: flex;
-    /*margin-left: 2rem;*/
-}
-
-.App-button {
-    width: 20%;
-    /*margin-right: 2rem;*/
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
-}
-
-.App-header-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 1700px;
-    margin: 0 2rem;
-}
-
-.App-header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 0;
-    background: linear-gradient(90deg, #4e8cff, #1c60d6);
-    color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-    width: 100%;
-    margin: 0;
-}
-
-.App-header h1 {
-    font-size: 2rem;
-    margin: 0.5rem 0;
-    font-weight: 700;
-}
-
-.App-header h2 {
-    font-size: 1.5rem;
-    margin: 0.5rem 0;
-}
-
-.App-header h3 {
-    font-size: 1.1rem;
-    margin: 0.2rem 0;
-}
-
-.App-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 1700px;
-}
-
-.lobby {
-    padding: 0 2rem;
-    min-width: 900px;
-}
-
-.dealer-controls {
-    margin-right: 3rem;
-    margin-left: 2rem;
-    display: flex;
-    flex-grow: 1;
-    flex-direction: column;
-    width: 40%;
-}
-
-.dealer-controls input, .dealer-controls select {
-    margin-left: 0;
-    padding: 0.5rem;
-    width: 100%;
-}
-
-.dealer-controls-buttons {
-    display: flex;
-    flex-direction: row;
-}
-
-.styled-checkbox-label {
-    display: flex;
-    align-items: center;
-    font-size: 1em;
-    gap: 0.5em;
-    margin-bottom: 0.3rem;
-}
-
-.styled-checkbox-label input[type="checkbox"] {
-    width: 1.2em;
-    height: 1.2em;
-    accent-color: var(--primary);
-    cursor: pointer;
-}
-
-.room {
-    display: flex;
-    flex-direction: row;
-    margin-top: 2rem;
-    height: calc(100vh - 170px);
-    width:100%;
-}
-
-.room-header {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    margin-bottom: 2rem;
-}
-
-.room-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    min-height: 0;
-    padding: 1rem;
-    width: 60%;
-}
-
-.room-title {
-    margin-left: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow:1;
-    width: 60%;
-}
-
-.leave-button {
-    float: right;
-    background: white;
-    color: black;
-    margin-right: 0;
-}
-
-.vote-buttons {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    margin-top: 1rem;
-}
-
-.vote-buttons button {
-    margin: 0.2rem;
-    width: 3rem;
-    padding: 0.5rem;
-    font-size: 1.3rem;
-    font-weight: bold;
-}
-
-.cards {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-}
-
-.card-name {
-    font-weight: bold;
-    text-align: center;
-    margin-top: 15px;
-    font-size: 1.6rem;
-}
-
-.flip-card {
-    background-color: transparent;
-    width: 12vh;
-    height: 15vh;
-    perspective: 1000px; /* Remove this if you don't want the 3D effect */
-}
-
-.flip-card-inner {
-    position: relative;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.8s;
-    transform-style: preserve-3d;
-    border: 1px solid black;
-    border-radius: 8px;
-}
-
-.flip-card.flipped .flip-card-inner {
-    transform: rotateY(180deg);
-}
-
-.flip-card-front, .flip-card-back {
-    position: absolute;
-    width: calc(100% - 20px);
-    height: calc(100% - 20px);
-    -webkit-backface-visibility: hidden; /* Safari */
-    backface-visibility: hidden;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 8px;
-    border: 10px solid white;
-    box-shadow: 5px 5px 10px 2px rgba(0, 0, 0, 0.2);
-}
-
-.flip-card-front {
-    background: linear-gradient(180deg, #34A853 , #096f2e);
-    color: white;
-    font-size: 8vh;
-    font-weight: bold;
-}
-
-.flip-card-back {
-    background-color: white;
-    transform: rotateY(180deg);
-    border-radius: 8px;
-    font-size: 8vh;
-}
-
-.highlight-vote {
-    font-weight: bold;
-    color: green;
-}
+/**** General ***/
 
 button {
     background: linear-gradient(180deg, #4e8cff, #1c60d6);
@@ -291,15 +45,6 @@ h2 {
     margin: 10px
 }
 
-.debug {
-    height: 200px;
-    max-width: 50%;
-    font-size: 20px;
-    overflow-y: scroll;
-    border: 1px solid black;
-    display: none;
-}
-
 input, select {
     width: 100%;
     /*max-width: 300px;*/
@@ -329,7 +74,175 @@ input:disabled {
     cursor: not-allowed;
 }
 
-.roomList {
+
+/**** App/Header ***/
+
+.app {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.app-logo {
+    height: 40vmin;
+    pointer-events: none;
+}
+
+.app-title {
+    width: 20%;
+    justify-content: left;
+    display: flex;
+    /*margin-left: 2rem;*/
+}
+
+.app-button {
+    width: 20%;
+    /*margin-right: 2rem;*/
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .app-logo {
+        animation: app-logo-spin infinite 20s linear;
+    }
+}
+
+.app-header-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 1700px;
+    margin: 0 2rem;
+}
+
+.app-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+    background: linear-gradient(90deg, #4e8cff, #1c60d6);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    width: 100%;
+    margin: 0;
+}
+
+.app-header h1 {
+    font-size: 2rem;
+    margin: 0.5rem 0;
+    font-weight: 700;
+}
+
+.app-header h2 {
+    font-size: 1.5rem;
+    margin: 0.5rem 0;
+}
+
+.app-header h3 {
+    font-size: 1.1rem;
+    margin: 0.2rem 0;
+}
+
+.app-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 1700px;
+}
+
+.app-room-title {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    width: 60%;
+}
+
+.app-leave-button {
+    float: right;
+    background: white;
+    color: black;
+    margin-right: 0;
+}
+
+/**** Dealer Controls ***/
+
+.dealer-controls {
+    margin-right: 3rem;
+    margin-left: 2rem;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    width: 40%;
+}
+
+.dealer-controls input, .dealer-controls select {
+    margin-left: 0;
+    padding: 0.5rem;
+    width: 100%;
+}
+
+.dealer-controls-buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+.dealer-checkbox-label {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    gap: 0.5em;
+    margin-bottom: 0.3rem;
+}
+
+.dealer-checkbox-label input[type="checkbox"] {
+    width: 1.2em;
+    height: 1.2em;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+/**** Room ***/
+
+.room-lobby {
+    padding: 0 2rem;
+    min-width: 900px;
+}
+
+.room {
+    display: flex;
+    flex-direction: row;
+    margin-top: 2rem;
+    height: calc(100vh - 170px);
+    width: 100%;
+}
+
+.room-header {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.room-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+    padding: 1rem;
+    width: 60%;
+}
+
+.room-list {
     border-top: 3px solid #9b9b9b;
     /*padding: 15px 20px 20px 20px;*/
     padding: 2rem 0;
@@ -337,7 +250,7 @@ input:disabled {
     background-color: #ffffff;
 }
 
-.roomRow {
+.room-row {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -351,14 +264,40 @@ input:disabled {
     width: 100%;
 }
 
-.roomEntry {
+.room-entry {
     display: flex;
     flex-direction: row;
+}
+
+.room-actions {
+    margin-left: 0.5rem;
+}
+
+.room-actions button {
+    margin-left: 0.5rem;
 }
 
 .room-info {
     display: flex;
     flex-direction: row;
+}
+
+.name-input {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center; /* vertically align within row */
+    gap: 0.5rem; /* consistent spacing */
+    margin-top: 1.5rem;
+}
+
+.debug {
+    height: 200px;
+    max-width: 50%;
+    font-size: 20px;
+    overflow-y: scroll;
+    border: 1px solid black;
+    display: none;
 }
 
 .player-count {
@@ -370,22 +309,98 @@ input:disabled {
     margin-left: 0.5rem;
 }
 
-.room-actions {
-    margin-left: 0.5rem;
-}
+/**** Votes  ***/
 
-.room-actions button {
-    margin-left: 0.5rem;
-}
-
-.name-input {
+.vote-buttons {
     display: flex;
     flex-direction: row;
+    align-items: center;
     justify-content: center;
-    align-items: center; /* vertically align within row */
-    gap: 0.5rem; /* consistent spacing */
-    margin-top: 1.5rem;
+    margin-top: 1rem;
 }
+
+.vote-buttons button {
+    margin: 0.2rem;
+    width: 3rem;
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+/**** Cards  ***/
+
+.cards {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-name {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 1.6rem;
+}
+
+.flip-card {
+    background-color: transparent;
+    width: 12vh;
+    height: 15vh;
+    perspective: 1000px;
+}
+
+.flip-card-inner {
+    position: relative;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+    border: 1px solid black;
+    border-radius: 8px;
+}
+
+.flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    border: 10px solid white;
+    box-shadow: 5px 5px 10px 2px rgba(0, 0, 0, 0.2);
+}
+
+.flip-card-front {
+    background: linear-gradient(180deg, #34A853, #096f2e);
+    color: white;
+    font-size: 8vh;
+    font-weight: bold;
+}
+
+.flip-card-back {
+    background-color: white;
+    transform: rotateY(180deg);
+    border-radius: 8px;
+    font-size: 8vh;
+}
+
+.highlight-vote {
+    font-weight: bold;
+    color: green;
+}
+
+/**** Tickets  ***/
 
 .ticket-info {
     margin-top: 1.5rem;
@@ -408,9 +423,8 @@ input:disabled {
     border-radius: 8px;
     border: 1px solid #d0d6ff;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-    max-width: 800px; /* constrain width */
-    width: 100%; /* allow it to shrink */
-    /*min-height: 80px;*/
+    max-width: 800px;
+    width: 100%;
     overflow-y: auto;
     margin: 0.2rem 0;
     max-height: 100%;
@@ -444,19 +458,17 @@ input:disabled {
     flex-direction: column;
     overflow-y: auto;
     margin-top: 1rem;
-    margin-bottom: 2rem; /* visual gap at the bottom */
+    margin-bottom: 2rem;
     min-height: 0;
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 8px;
     background: #fff;
     height: 100%;
-    /*width: 30vw;*/
 }
 
 .ticket-list-card {
     cursor: pointer;
-    /*width: 26vw;*/
     width: 90%;
 }
 
@@ -477,6 +489,8 @@ input:disabled {
     margin: 0 0 0.5rem 0;
     font-weight: 600;
 }
+
+/**** Viewers  ***/
 
 .viewer-container {
     margin-left: auto;
@@ -511,6 +525,8 @@ input:disabled {
 .viewer-icon {
     font-size: 3rem;
 }
+
+/**** Effects  ***/
 
 .firework {
     position: absolute;
@@ -577,13 +593,20 @@ input:disabled {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
+
+/**** Dialog  ***/
 
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -596,7 +619,7 @@ input:disabled {
     border-radius: 8px;
     min-width: 300px;
     text-align: center;
-    color:black;
+    color: black;
 }
 
 .modal-actions {
