@@ -59,6 +59,15 @@ function refreshRooms(rooms, io) {
   io.emit("roomsList", roomList);
 }
 
+
+function handleShowVotes(room) {
+  const playerIds = Object.entries(room.voters)
+      .filter(([id, voter]) => !voter.removed)
+      .map(([id]) => id);
+
+  room.showVotes = playerIds.every(id => room.votes[id] !== undefined);
+}
+
 module.exports = (io, rooms) => ({
   createRoom: (socket, {roomId, name, userId}) => {
     rooms[roomId] = {viewers: {}, dealer: {name, userId}, voters: {}, votes: {}, showVotes: false};
@@ -70,14 +79,26 @@ module.exports = (io, rooms) => ({
   },
 
   joinRoom: (socket, {roomId, name, userId}) => {
+    let room = rooms[roomId];
+
+    if (!room) return;
+
     console.log("Voter joined:", roomId, name, userId);
 
-    if (!rooms[roomId]) return;
     socket.join(roomId);
-    rooms[roomId].voters[userId] = {name, userId, socketId: socket.id, removed: false};
 
-    io.to(roomId).emit("roomUpdate", rooms[roomId]);
-    socket.emit("roomUpdate", rooms[roomId]);
+    if (room.viewers[userId]) {
+      delete room.viewers[userId];
+    }
+
+    room.voters[userId] = {name, userId, socketId: socket.id, removed: false};
+
+    handleShowVotes(room);
+
+    console.log(room);
+
+    io.to(roomId).emit("roomUpdate", room);
+    socket.emit("roomUpdate", room);
     },
 
   openRoom: (socket, {roomId, name, userId}) => {
@@ -85,8 +106,20 @@ module.exports = (io, rooms) => ({
 
     let room = rooms[roomId];
     if (!room) return;
+
     socket.join(roomId);
+
+    if (room.voters[userId]) {
+      delete room.voters[userId];
+    }
+
+    if (room.votes[userId]) {
+      delete room.votes[userId];
+    }
+
     room.viewers[userId] = {name, userId, socketId: socket.id, removed: false};
+
+    console.log(room);
 
     io.to(roomId).emit("roomUpdate", room);
     socket.emit("roomUpdate", room);
@@ -106,13 +139,7 @@ module.exports = (io, rooms) => ({
     rooms[roomId].votes[userId] = vote;
 
     const room = rooms[roomId];
-
-    // Check if all players have voted
-    const playerIds = Object.entries(room.voters)
-        .filter(([id, voter]) => !voter.removed)
-      .map(([id]) => id);
-
-    room.showVotes = playerIds.every(id => room.votes[id] !== undefined);
+    handleShowVotes(room);
 
     io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes});
   },

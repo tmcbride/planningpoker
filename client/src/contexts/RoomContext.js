@@ -170,8 +170,15 @@ export function RoomProvider({children}) {
     socket.emit("vote", { roomId, vote: value, userId: currentUserId });
   };
 
-  const isCurrentUserViewer = () => !!room?.viewers?.[currentUserId];
-  const isCurrentUserVoter = () => !!room?.voters?.[currentUserId];
+  const isCurrentUserViewer = () => {
+    let viewer = room?.viewers?.[currentUserId];
+    return viewer && !viewer.removed;
+  }
+
+  const isCurrentUserVoter = () => {
+    let voter = room?.voters?.[currentUserId];
+    return voter && !voter.removed;
+  }
 
   const isUserDealer = (userId) => {
     console.log(
