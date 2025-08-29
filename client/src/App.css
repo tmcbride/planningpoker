@@ -2,6 +2,7 @@
     --primary: #4e8cff;
     --primary-dark: #1c60d6;
     --accent: #ffb84d;
+    --highlight: green;
     --bg: #f5f7fa;
     --text: #333;
 }
@@ -355,6 +356,8 @@ input:disabled {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+    min-width: 90px;
+    position: relative;
 }
 
 .card-name {
@@ -362,6 +365,8 @@ input:disabled {
     text-align: center;
     margin-top: 15px;
     font-size: 1.6rem;
+    max-width: 12vh;
+    white-space: normal;
 }
 
 .flip-card {
@@ -397,7 +402,7 @@ input:disabled {
     align-items: center;
     border-radius: 8px;
     border: 1vh solid white;
-    box-shadow: 5px 5px 1vh 2px rgba(0, 0, 0, 0.2);
+    box-shadow: .5vh .5vh 1vh .2vh rgba(0, 0, 0, 0.2);
 }
 
 .flip-card-front {
@@ -417,6 +422,25 @@ input:disabled {
 .highlight-vote {
     font-weight: bold;
     color: green;
+}
+
+.card-icon {
+    position: absolute;
+    top: .5vh;
+    left: 1.5vh;
+    font-size: 2.5vh;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.most-voted {
+    color: var(--accent);
+}
+
+.outside-vote {
+    /*font-size: 5vh;*/
+    font-size: 2.3vh;
+
 }
 
 /**** Tickets  ***/

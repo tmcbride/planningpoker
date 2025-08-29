@@ -1,5 +1,6 @@
 import {useRoom} from "../contexts/RoomContext";
 import {useEffect, useState, useMemo} from "react";
+import {VoteIcon} from "./voteIcon";
 
 export function Votes() {
   const {
@@ -34,11 +35,9 @@ export function Votes() {
     if (votes.length < 3) {
       const first = votes[0];
       if (votes.every(v => v === first)) {
-        console.log("Most Common Vote ", first);
         return first;
       }
 
-      console.log("Votes don't all match ", first);
       return null;
     }
 
@@ -48,9 +47,9 @@ export function Votes() {
 
     votes.forEach((vote) => {
       counts[vote] = (counts[vote] || 0) + 1;
-      if (counts[vote] > maxCount) {
+      if (counts[vote] >= maxCount) {
+        mostCommon = counts[vote] === maxCount ? null : vote;
         maxCount = counts[vote];
-        mostCommon = vote;
       }
     });
 
@@ -71,6 +70,7 @@ export function Votes() {
               <div key={id} className="player-card">
                 <div className={`flip-card ${show ? "flipped" : ""}`}>
                   <div className="flip-card-inner">
+                    <VoteIcon mostCommonVote={mostCommonVote} voteValue={voteValue} show={room.showVotes} />
                     <div className="flip-card-front">
                       {voteValue !== undefined
                         ? <div>&#x2713;</div>
@@ -109,7 +109,7 @@ export function Votes() {
 
       {isCurrentUserDealer() && (
         <div className="vote-buttons">
-          <button className="vote-action-button" key="reset" onClick={() => resetVotes()} disabled={!room.isVoting || !room.currentTicket}>
+          <button className="vote-action-button" key="reset" onClick={() => resetVotes()} disabled={(!room.isVoting || !room.currentTicket) && !room.showVotes}>
             Reset Votes
           </button>
         </div>
