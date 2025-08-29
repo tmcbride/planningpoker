@@ -55,6 +55,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", (data) => handlers.joinRoom(socket, data));
   socket.on("setTicket", (data) => handlers.setTicket(data));
   socket.on("vote", (data) => handlers.vote(socket, data));
+  socket.on("clearVote", (data) => handlers.clearVote(socket, data));
   socket.on("requestRooms", () => handlers.requestRooms(io));
   socket.on("resetVotes", (data) => handlers.resetVotes(data));
   socket.on("disconnect", () => handlers.disconnect(socket));

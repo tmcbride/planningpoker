@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { useRef } from "react";
+import { toast } from 'react-toastify';
 
 const RoomContext = createContext();
 export const useRoom = () => useContext(RoomContext);
@@ -47,7 +48,7 @@ export function RoomProvider({children}) {
   }, [socket]);
 
   useEffect(() => {
-    const handleVotesUpdate = (data) => setRoom(prev => prev ? ({ ...prev, votes: data.votes, showVotes: data.showVotes }) : prev);
+    const handleVotesUpdate = (data) => setRoom(prev => prev ? ({ ...prev, votes: data.votes, showVotes: data.showVotes, isVoting: data.isVoting }) : prev);
     socket.on("votesUpdate", handleVotesUpdate);
     return () => socket.off("votesUpdate", handleVotesUpdate);
   }, [socket]);
@@ -158,7 +159,12 @@ export function RoomProvider({children}) {
   }, []);
 
   const setCurrentTicket = (ticket) => {
-    if (!ticket) return alert("Enter a ticket");
+    if (room.isVoting) {
+      toast("Voting in progress, reset votes before you can select a new ticket");
+      return;
+    }
+
+    if (!ticket) return toast("Enter a ticket");
     socket.emit("setTicket", { roomId, ticket: ticket });
   };
 
@@ -168,6 +174,10 @@ export function RoomProvider({children}) {
 
   const vote = (value) => {
     socket.emit("vote", { roomId, vote: value, userId: currentUserId });
+  };
+
+  const clearVote = () => {
+    socket.emit("clearVote", { roomId, userId: currentUserId });
   };
 
   const isCurrentUserViewer = () => {
@@ -213,6 +223,7 @@ export function RoomProvider({children}) {
         setCurrentTicket,
         resetVotes,
         vote,
+        clearVote,
         currentUserId,
         closeRoom,
         socket,

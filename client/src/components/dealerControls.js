@@ -26,10 +26,11 @@ export function DealerControls() {
             .catch((err) => console.error("Error fetching projects:", err));
     }, []);
 
-    useEffect(() => {
+    function loadTicketsForBoard() {
         if (!board) return;
 
         setLoading(true);
+
         fetch(`${apiUrl}/api/tickets/${board.id}/${projectVersion}`)
             .then(res => res.json())
             .then(data => {
@@ -40,6 +41,10 @@ export function DealerControls() {
                 console.error("Error fetching rooms:", err);
                 setLoading(false);
             });
+    }
+
+    useEffect(() => {
+        loadTicketsForBoard();
     }, [board]);
 
     function isCurrentTicket(ticketKey) {
@@ -70,14 +75,20 @@ export function DealerControls() {
                     </option>
                 ))}
             </select>
-            <label className="dealer-checkbox-label">
-                <input
-                    type="checkbox"
-                    checked={hideWithStoryPoints}
-                    onChange={e => setHideWithStoryPoints(e.target.checked)}
-                />
-                Hide tickets with story points
-            </label>
+            <div className="dealer-controls-buttons">
+                <label className="dealer-checkbox-label">
+                    <input
+                        type="checkbox"
+                        checked={hideWithStoryPoints}
+                        onChange={e => setHideWithStoryPoints(e.target.checked)}
+                    />
+                    Hide tickets with story points
+                </label>
+                <button disabled={!board} onClick={loadTicketsForBoard}>
+                    Reload
+                </button>
+            </div>
+
             <div className="ticket-list">
                 {loading ? (
                     <div className="loading-indicator">

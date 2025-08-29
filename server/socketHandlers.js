@@ -59,18 +59,20 @@ function refreshRooms(rooms, io) {
   io.emit("roomsList", roomList);
 }
 
-
 function handleShowVotes(room) {
   const playerIds = Object.entries(room.voters)
       .filter(([id, voter]) => !voter.removed)
       .map(([id]) => id);
 
-  room.showVotes = playerIds.every(id => room.votes[id] !== undefined);
+  let allVoted = playerIds.every(id => room.votes[id] !== undefined);
+  room.showVotes = allVoted;
+  room.isVoting = allVoted ? false : playerIds.some(id => room.votes[id] !== undefined);
+  console.log(room);
 }
 
 module.exports = (io, rooms) => ({
   createRoom: (socket, {roomId, name, userId}) => {
-    rooms[roomId] = {viewers: {}, dealer: {name, userId}, voters: {}, votes: {}, showVotes: false};
+    rooms[roomId] = {viewers: {}, dealer: {name, userId}, voters: {}, votes: {}, showVotes: false, isVoting: false};
 
     socket.join(roomId);
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
@@ -126,22 +128,34 @@ module.exports = (io, rooms) => ({
   },
 
   setTicket: ({roomId, ticket}) => {
-    if (rooms[roomId]) {
-      rooms[roomId].currentTicket = ticket;
-      rooms[roomId].votes = {};
+    let room = rooms[roomId];
 
-      io.to(roomId).emit("ticketUpdate", rooms[roomId].currentTicket);
+    if (room) {
+      room.currentTicket = ticket;
+      room.votes = {};
+
+      io.to(roomId).emit("ticketUpdate", room.currentTicket);
     }
   },
 
   vote: (socket, {roomId, vote, userId}) => {
     if (!rooms[roomId]) return;
-    rooms[roomId].votes[userId] = vote;
-
     const room = rooms[roomId];
+
+    room.votes[userId] = vote;
     handleShowVotes(room);
 
-    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes});
+    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes, isVoting: room.isVoting});
+  },
+
+  clearVote: (socket, {roomId, userId}) => {
+    if (!rooms[roomId]) return;
+    const room = rooms[roomId];
+
+    delete room.votes[userId];
+    handleShowVotes(room);
+
+    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes, isVoting: room.isVoting});
   },
 
   requestRooms: (io) => {
@@ -170,6 +184,7 @@ module.exports = (io, rooms) => ({
     if (rooms[roomId]) {
       rooms[roomId].votes = {};
       rooms[roomId].showVotes = false;
+      rooms[roomId].isVoting = false;
       io.to(roomId).emit("roomUpdate", rooms[roomId]);
     }
   },

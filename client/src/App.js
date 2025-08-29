@@ -5,6 +5,9 @@ import {Room} from "./components/room";
 import {NameInput} from "./components/nameInput";
 import {LeaveCloseButtons} from "./components/leaveCloseButtons";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
     const {room, roomId} = useRoom();
     const dealer = room && room.dealer ? room.dealer : "";
@@ -33,6 +36,10 @@ function App() {
                 {!room && (<NameInput/>)}
                 {element}
             </div>
+            <ToastContainer
+                position="top-center"
+                theme="dark"
+            />
         </div>
     );
 }

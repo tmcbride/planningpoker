@@ -19,6 +19,13 @@ module.exports = (rooms) => {
     res.json(roomList);
   });
 
+  router.get("/clearRooms", (req, res) => {
+    Object.keys(rooms).forEach(roomId => {
+      delete rooms[roomId];
+    });
+    res.json({ success: true });
+  });
+
   router.get("/tickets/:projectId", async (req, res) => {
     const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/backlog?maxResults=100`; //&jql=fixVersion=${req.params.fixVersion}`;
     let data = await makeJiraCall(jiraUrl);

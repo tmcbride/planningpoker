@@ -3,7 +3,7 @@ import {useEffect, useState, useMemo} from "react";
 
 export function Votes() {
   const {
-    room, currentUserId, isCurrentUserVoter, vote
+    room, currentUserId, isCurrentUserVoter, isCurrentUserDealer, vote, clearVote, resetVotes,
   } = useRoom();
   const [showFireworks, setShowFireworks] = useState(false);
 
@@ -68,7 +68,7 @@ export function Votes() {
             const voteValue = room.votes[id];
             const show = room.showVotes || (id === currentUserId && voteValue !== undefined);
             return (
-              <div key={id}>
+              <div key={id} className="player-card">
                 <div className={`flip-card ${show ? "flipped" : ""}`}>
                   <div className="flip-card-inner">
                     <div className="flip-card-front">
@@ -97,10 +97,21 @@ export function Votes() {
       {isCurrentUserVoter() && (
         <div className="vote-buttons">
           {[1, 2, 3, 5, 8, 13].map((v) => (
-            <button key={v} onClick={() => vote(v)} disabled={room.showVotes || !room.currentTicket}>
+            <button className="vote-button"  key={v} onClick={() => vote(v)} disabled={room.showVotes || !room.currentTicket}>
               {v}
             </button>
           ))}
+          <button className="vote-action-button" key="clear" onClick={() => clearVote()} disabled={room.showVotes || !room.currentTicket}>
+            Clear
+          </button>
+        </div>
+      )}
+
+      {isCurrentUserDealer() && (
+        <div className="vote-buttons">
+          <button className="vote-action-button" key="reset" onClick={() => resetVotes()} disabled={!room.isVoting || !room.currentTicket}>
+            Reset Votes
+          </button>
         </div>
       )}
     </div>
