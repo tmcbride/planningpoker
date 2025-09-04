@@ -49,7 +49,7 @@ export function RoomProvider({children}) {
   }, [socket]);
 
   useEffect(() => {
-    const handleVotesUpdate = (data) => setRoom(prev => prev ? ({ ...prev, votes: data.votes, showVotes: data.showVotes, isVoting: data.isVoting }) : prev);
+    const handleVotesUpdate = (data) => setRoom(prev => prev ? ({ ...prev, votes: data.votes, showVotes: data.showVotes, isVoting: data.isVoting, showFireworks: data.showFireworks }) : prev);
     socket.on("votesUpdate", handleVotesUpdate);
     return () => socket.off("votesUpdate", handleVotesUpdate);
   }, [socket]);

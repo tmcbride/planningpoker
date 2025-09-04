@@ -4,24 +4,23 @@ import {VoteIcon} from "./voteIcon";
 
 export function Votes() {
   const {
-    room, currentUserId, isCurrentUserVoter, isCurrentUserDealer, vote, clearVote, resetVotes,
+    room, currentUserId, isCurrentUserVoter, isCurrentUserDealer, vote, clearVote, resetVotes
   } = useRoom();
   const [showFireworks, setShowFireworks] = useState(false);
 
   useEffect(() => {
-    if (room.showVotes && !room.fireworksShown) {
-      const votes = getVotes();
-      if (votes.length > 1) {
-        const first = votes[0];
-        if (votes.every(v => v === first)) {
-          setShowFireworks(true);
-          room.fireworksShown = true;
-          const timer = setTimeout(() => setShowFireworks(false), 2800);
-          return () => clearTimeout(timer);
-        }
-      }
+    console.log("Show Fireworks: " + room.showFireworks);
+    if (room.showFireworks) {
+        setShowFireworks(true)
     }
-  }, [room.showVotes, room.votes]);
+  }, [room.showFireworks]);
+
+  useEffect(() => {
+    if (showFireworks) {
+      const timer = setTimeout(() => setShowFireworks(false), 2800);
+      return () => clearTimeout(timer);
+    }
+  }, [showFireworks])
 
   function getVotes() {
     return Object.entries(room.voters)
@@ -61,7 +60,7 @@ export function Votes() {
 
   return (
     <div>
-      {/*{showFireworks && <div className="firework"></div>}*/}
+      {showFireworks && <div className="firework"></div>}
       <div className="cards">
         {room && room.voters && Object.entries(room.voters)
             .filter(([id, voter]) => id !== undefined && !voter.removed)

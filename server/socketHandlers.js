@@ -64,15 +64,19 @@ function handleShowVotes(room) {
       .filter(([id, voter]) => !voter.removed)
       .map(([id]) => id);
 
-  let allVoted = playerIds.every(id => room.votes[id] !== undefined);
+  let votes = room.votes;
+  let allVoted = playerIds.every(id => votes[id] !== undefined);
   room.showVotes = allVoted;
-  room.isVoting = allVoted ? false : playerIds.some(id => room.votes[id] !== undefined);
+  room.isVoting = allVoted ? false : playerIds.some(id => votes[id] !== undefined);
+  let values = Object.values(votes);
+  room.showFireworks = values.length > 1 && values.every(v => v === values[0]);
+
   console.log(room);
 }
 
 module.exports = (io, rooms) => ({
   createRoom: (socket, {roomId, name, userId}) => {
-    rooms[roomId] = {viewers: {}, dealer: {name, userId}, voters: {}, votes: {}, showVotes: false, isVoting: false};
+    rooms[roomId] = {viewers: {}, dealer: {name, userId}, voters: {}, votes: {}, showVotes: false, isVoting: false, showFireworks: false};
 
     socket.join(roomId);
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
@@ -96,6 +100,8 @@ module.exports = (io, rooms) => ({
     room.voters[userId] = {name, userId, socketId: socket.id, removed: false};
 
     handleShowVotes(room);
+
+    room.showFireworks = false;
 
     console.log(room);
 
@@ -133,7 +139,7 @@ module.exports = (io, rooms) => ({
     if (room) {
       room.currentTicket = ticket;
       room.votes = {};
-      room.fireworksShown = false;
+      room.showFireworks = false;
 
       io.to(roomId).emit("ticketUpdate", room.currentTicket);
     }
@@ -146,7 +152,7 @@ module.exports = (io, rooms) => ({
     room.votes[userId] = vote;
     handleShowVotes(room);
 
-    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes, isVoting: room.isVoting});
+    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes, isVoting: room.isVoting, showFireworks: room.showFireworks});
   },
 
   clearVote: (socket, {roomId, userId}) => {
@@ -156,7 +162,7 @@ module.exports = (io, rooms) => ({
     delete room.votes[userId];
     handleShowVotes(room);
 
-    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes, isVoting: room.isVoting});
+    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes, isVoting: room.isVoting, showFireworks: room.showFireworks});
   },
 
   requestRooms: (io) => {
@@ -186,7 +192,7 @@ module.exports = (io, rooms) => ({
       rooms[roomId].votes = {};
       rooms[roomId].showVotes = false;
       rooms[roomId].isVoting = false;
-      rooms[roomId].fireworksShown = false;
+      rooms[roomId].showFireworks = false;
       io.to(roomId).emit("roomUpdate", rooms[roomId]);
     }
   },
