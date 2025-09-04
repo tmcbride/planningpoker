@@ -12,7 +12,7 @@ export function DealerControls() {
     const [projectVersion, setProjectVersion] = useState("");
     const [boardList, setBoardList] = useState([]);
     const [ticketList, setTicketList] = useState([]);
-    const apiUrl = process.env.REACT_APP_API_URL;
+    const apiUrl = process.env.REACT_APP_API_URL ?? "/poker";
     const [hideWithStoryPoints, setHideWithStoryPoints] = useState(true);
     const [loading, setLoading] = useState(false);
 

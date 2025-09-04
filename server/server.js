@@ -46,25 +46,84 @@ async function clearRooms() {
   handlers.requestRooms(io);
 }
 
+function updateRoomActivity(roomId) {
+  if (rooms[roomId]) {
+    rooms[roomId].lastActivity = Date.now();
+  }
+}
+
 handlers = getHandlers(io, rooms);
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.on("createRoom", (data) => handlers.createRoom(socket, data));
-  socket.on("joinRoom", (data) => handlers.joinRoom(socket, data));
-  socket.on("setTicket", (data) => handlers.setTicket(data));
-  socket.on("vote", (data) => handlers.vote(socket, data));
-  socket.on("clearVote", (data) => handlers.clearVote(socket, data));
+  socket.on("createRoom", (data) => {
+    handlers.createRoom(socket, data);
+    startCleanupInterval()
+    updateRoomActivity(data.roomId);
+  });
+  socket.on("joinRoom", (data) => {
+    handlers.joinRoom(socket, data);
+    updateRoomActivity(data.roomId);
+  });
+  socket.on("setTicket", (data) => {
+    handlers.setTicket(data);
+    updateRoomActivity(data.roomId);
+  });
+  socket.on("vote", (data) => {
+    handlers.vote(socket, data);
+    updateRoomActivity(data.roomId);
+  });
+  socket.on("clearVote", (data) => {
+    handlers.clearVote(socket, data);
+    updateRoomActivity(data.roomId);
+  });
   socket.on("requestRooms", () => handlers.requestRooms(io));
-  socket.on("resetVotes", (data) => handlers.resetVotes(data));
+  socket.on("resetVotes", (data) => {
+    handlers.resetVotes(data);
+    updateRoomActivity(data.roomId);
+  });
   socket.on("disconnect", () => handlers.disconnect(socket));
   socket.on("clearRooms", () => clearRooms());
   socket.on("closeRoom",  (data) => { handlers.closeRoom(io, data); handlers.requestRooms(io) });
   socket.on("leaveRoomViewer", (data) => handlers.leaveRoomViewer(socket, data));
   socket.on("leaveRoomVoter", (data) => handlers.leaveRoomVoter(socket, data));
-  socket.on("openRoom", (data) => handlers.openRoom(socket, data));
+  socket.on("openRoom", (data) => {
+    handlers.openRoom(socket, data);
+    updateRoomActivity(data.roomId);
+  });
 });
 
+let cleanupInterval = null;
+
+function startCleanupInterval() {
+  if (!cleanupInterval) {
+    cleanupInterval = setInterval(cleanupIdleRooms, 60 * 1000);
+  }
+}
+
+function stopCleanupInterval() {
+  if (cleanupInterval) {
+    clearInterval(cleanupInterval);
+    cleanupInterval = null;
+  }
+}
+
+function cleanupIdleRooms() {
+  const now = Date.now();
+  const ONE_HOUR = 60 * 60 * 1000;
+  for (const roomId in rooms) {
+    let lastActivity = rooms[roomId].lastActivity;
+    if (lastActivity && now - lastActivity > ONE_HOUR) {
+      delete rooms[roomId];
+      console.log(`Room ${roomId} cleared due to inactivity.`);
+    }
+  }
+
+  // Stop interval if no rooms left
+  if (Object.keys(rooms).length === 0) {
+    stopCleanupInterval();
+  }
+}
 
 server.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));

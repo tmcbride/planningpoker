@@ -346,7 +346,7 @@ input:disabled {
     flex-direction: row;
     gap: 1rem;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
 }
 
@@ -356,7 +356,7 @@ input:disabled {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    min-width: 90px;
+    /*min-width: 90px;*/
     position: relative;
 }
 
@@ -364,10 +364,24 @@ input:disabled {
     font-weight: bold;
     text-align: center;
     margin-top: 15px;
-    font-size: 1.6rem;
-    max-width: 12vh;
+    font-size: max(1.5vw, 18px);
+    width: 15vh;
     white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+/*@media (max-height: 800px) {*/
+/*    .card-name {*/
+/*        font-size: 1.2rem;*/
+/*    }*/
+/*}*/
+
+/*@media (max-height: 700px) {*/
+/*    .card-name {*/
+/*        font-size: 1.0rem;*/
+/*    }*/
+/*}*/
 
 .flip-card {
     background-color: transparent;

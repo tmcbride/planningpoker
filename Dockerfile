@@ -2,9 +2,11 @@ FROM node:18
 
 WORKDIR /app
 
-RUN git clone https://github.com/tmcbride/planningpoker.git
+COPY . .
 
-WORKDIR /app/planningpoker
+COPY .env .
+
+COPY .env ./client
 
 RUN npm install
 
