@@ -5,7 +5,7 @@ import {Dialog} from "./confirm";
 
 export function Lobby() {
   const {
-    socket, joinRoom, openRoom, currentUserId, name
+    socket, joinRoom, openRoom, currentUserId, name, nameWarning
   } = useRoom();
 
   const [availableRooms, setAvailableRooms] = useState([]);
@@ -32,12 +32,11 @@ export function Lobby() {
     }, [apiUrl]);
 
   function isRoomDealer(room) {
-    console.log("Comparing ", room, " and ", currentUserId);
     return room.dealerId && room.dealerId === currentUserId;
   }
 
   function handleJoin(roomId, viewer) {
-    if (!name) {
+    if (!name || nameWarning) {
       setDialogWarning(true);
       return;
     }
@@ -87,7 +86,7 @@ export function Lobby() {
       </div>
       <Dialog
           open={dialogWarning}
-          message="Please enter your name to join a room"
+          message="Please enter a valid name to join a room"
           onCancel={() => setDialogWarning(false)}
       />
       <Debug/>

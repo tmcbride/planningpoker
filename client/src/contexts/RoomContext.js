@@ -27,6 +27,7 @@ export function RoomProvider({children}) {
   let initialState = loadOrGenerateUserId();
   const [currentUserId] = useState(initialState);
   const [ticket, setTicket] = useState(null);
+  const [nameWarning, setNameWarning] = useState(false);
 
   const socketRef = useRef(null);
   const apiUrl = process.env.REACT_APP_SOCKET_URL || "";
@@ -230,7 +231,9 @@ export function RoomProvider({children}) {
         isUserDealer,
         isCurrentUserDealer,
         isCurrentUserViewer,
-        isCurrentUserVoter
+        isCurrentUserVoter,
+        nameWarning,
+        setNameWarning
       }}
     >
       {children}

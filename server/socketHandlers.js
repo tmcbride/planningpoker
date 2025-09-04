@@ -53,7 +53,7 @@ function removeUserBySocketId(rooms, roomId, socketId) {
 function refreshRooms(rooms, io) {
   const roomList = Object.keys(rooms).map(roomId => ({
     id: roomId,
-    playerCount: Object.values(rooms[roomId].voters).length
+    playerCount: Object.values(rooms[roomId].voters).filter(([voter]) => voter.removed !== true).length
   }));
   console.log("Sending Rooms: ", roomList);
   io.emit("roomsList", roomList);
@@ -133,6 +133,7 @@ module.exports = (io, rooms) => ({
     if (room) {
       room.currentTicket = ticket;
       room.votes = {};
+      room.fireworksShown = false;
 
       io.to(roomId).emit("ticketUpdate", room.currentTicket);
     }
@@ -185,6 +186,7 @@ module.exports = (io, rooms) => ({
       rooms[roomId].votes = {};
       rooms[roomId].showVotes = false;
       rooms[roomId].isVoting = false;
+      rooms[roomId].fireworksShown = false;
       io.to(roomId).emit("roomUpdate", rooms[roomId]);
     }
   },

@@ -9,12 +9,13 @@ export function Votes() {
   const [showFireworks, setShowFireworks] = useState(false);
 
   useEffect(() => {
-    if (room.showVotes) {
+    if (room.showVotes && !room.fireworksShown) {
       const votes = getVotes();
       if (votes.length > 1) {
         const first = votes[0];
         if (votes.every(v => v === first)) {
           setShowFireworks(true);
+          room.fireworksShown = true;
           const timer = setTimeout(() => setShowFireworks(false), 2800);
           return () => clearTimeout(timer);
         }
@@ -23,7 +24,9 @@ export function Votes() {
   }, [room.showVotes, room.votes]);
 
   function getVotes() {
-    return Object.values(room.votes).filter(v => v !== undefined);
+    return Object.entries(room.voters)
+        .filter(([id, voter])=> !voter?.removed && room.votes[id] !== undefined)
+        .map(([id]) => room.votes[id]);
   }
 
   const mostCommonVote = useMemo(() => {
@@ -53,8 +56,8 @@ export function Votes() {
       }
     });
 
-    return mostCommon;
-  }, [room.votes]);
+    return maxCount >= votes.length / 2 ? mostCommon : null;
+  }, [room.votes, room.voters]);
 
   return (
     <div>

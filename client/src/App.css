@@ -2,6 +2,7 @@
     --primary: #4e8cff;
     --primary-dark: #1c60d6;
     --accent: #ffb84d;
+    --higher-vote: #ff1900;
     --highlight: green;
     --bg: #f5f7fa;
     --text: #333;
@@ -296,8 +297,18 @@ input:disabled {
     flex-direction: row;
     justify-content: center;
     align-items: center; /* vertically align within row */
-    gap: 0.5rem; /* consistent spacing */
+    /*gap: 0.5rem; !* consistent spacing *!*/
     margin-top: 1.5rem;
+}
+
+.invalid-input {
+    border: 2px solid red;
+}
+
+.name-warning-label {
+    color: red;
+    font-weight: bold;
+    cursor: help;
 }
 
 .debug {
@@ -356,7 +367,6 @@ input:disabled {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    /*min-width: 90px;*/
     position: relative;
 }
 
@@ -370,18 +380,6 @@ input:disabled {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-/*@media (max-height: 800px) {*/
-/*    .card-name {*/
-/*        font-size: 1.2rem;*/
-/*    }*/
-/*}*/
-
-/*@media (max-height: 700px) {*/
-/*    .card-name {*/
-/*        font-size: 1.0rem;*/
-/*    }*/
-/*}*/
 
 .flip-card {
     background-color: transparent;
@@ -434,8 +432,9 @@ input:disabled {
 }
 
 .highlight-vote {
-    font-weight: bold;
-    color: green;
+    /*font-weight: bold;*/
+    /*color: green;*/
+    box-shadow: 0px 0px 15px green;
 }
 
 .card-icon {
@@ -452,9 +451,8 @@ input:disabled {
 }
 
 .outside-vote {
-    /*font-size: 5vh;*/
     font-size: 2.3vh;
-
+    color: var(--higher-vote);
 }
 
 /**** Tickets  ***/
@@ -506,8 +504,6 @@ input:disabled {
     flex-shrink: 1;
     overflow-y: auto;
     margin: 0.5rem 0;
-    white-space: pre-wrap;
-    word-break: break-word;
 }
 
 .ticket-list {
