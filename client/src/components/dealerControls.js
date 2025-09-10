@@ -1,5 +1,5 @@
 import {useRoom} from "../contexts/RoomContext";
-import {useState, useEffect} from "react";
+import {useEffect, useState} from "react";
 
 export function DealerControls() {
     const {
