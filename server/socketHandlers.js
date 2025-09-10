@@ -71,7 +71,7 @@ function handleShowVotes(room) {
     room.isVoting = allVoted ? false : playerIds.some(id => votes[id] !== undefined);
 
     let values = Object.values(votes);
-    room.showFireworks = allVoted && values.length > 1 && values.every(v => v === values[0]);
+    room.showFireworks = playerIds.length > 1 && allVoted && values.length > 1 && values.every(v => v === values[0]);
 
     console.log(room);
 }
@@ -147,6 +147,10 @@ module.exports = (io, rooms) => ({
         }
 
         room.viewers[userId] = {name, userId, socketId: socket.id, removed: false};
+
+        handleShowVotes(room);
+
+        room.showFireworks = false;
 
         console.log(room);
 
