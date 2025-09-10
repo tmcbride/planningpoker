@@ -9,8 +9,7 @@ export function Votes() {
   const [showFireworks, setShowFireworks] = useState(false);
 
   useEffect(() => {
-    console.log("Show Fireworks: " + room.showFireworks);
-    if (room.showFireworks) {
+    if (room.showVotes && room.showFireworks) {
         setShowFireworks(true)
     }
   }, [room.showFireworks]);

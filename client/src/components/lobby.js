@@ -15,7 +15,6 @@ export function Lobby() {
 
   useEffect(() => {
     const handleRoomUpdate = (data) => {
-      console.log("Recieved: ", data);
       setAvailableRooms(data);
     }
     socket.on("roomsList", handleRoomUpdate);

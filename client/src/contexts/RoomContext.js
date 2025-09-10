@@ -63,24 +63,23 @@ export function RoomProvider({children}) {
   useEffect(() => {
     const handleVoterUpdate = (data) => {
       setRoom(prev => prev ? ({...prev, voters: data}) : prev);
-      console.log(data);
     }
     socket.on("voterUpdate", handleVoterUpdate);
     return () => socket.off("voterUpdate", handleVoterUpdate);
   }, [socket]);
 
   useEffect(() => {
-    const handleTicketUpdate = (data) => setRoom(prev => prev ? ({ ...prev, currentTicket: data, showVotes: false, votes: {} }) : prev);
+    const handleTicketUpdate = (data) => setRoom(prev => prev ? ({ ...prev, currentTicket: data, showVotes: false, votes: {}, showFireworks: false }) : prev);
     socket.on("ticketUpdate", handleTicketUpdate);
     return () => socket.off("ticketUpdate", handleTicketUpdate);
   }, [socket]);
 
-  useEffect(() => {
-    const logEvent = (event, ...args) => console.log("Socket event received:", event, args);
-    socket.onAny(logEvent);
-
-    return () => socket.offAny(logEvent);
-  }, [socket]);
+  // useEffect(() => {
+  //   const logEvent = (event, ...args) => console.log("Socket event received:", event, args);
+  //   socket.onAny(logEvent);
+  //
+  //   return () => socket.offAny(logEvent);
+  // }, [socket]);
 
   useEffect(() => {
     if (!socket) return;
@@ -166,6 +165,7 @@ export function RoomProvider({children}) {
     }
 
     if (!ticket) return toast("Enter a ticket");
+
     socket.emit("setTicket", { roomId, ticket: ticket });
   };
 
@@ -192,11 +192,6 @@ export function RoomProvider({children}) {
   }
 
   const isUserDealer = (userId) => {
-    console.log(
-      "currentUserId:", currentUserId, typeof currentUserId,
-      "dealerId:", room?.dealer?.userId, typeof room?.dealer?.userId,
-      "equal?:", currentUserId === room?.dealer?.userId
-    );
     return room && room.dealer && room.dealer.userId === userId;
   }
 

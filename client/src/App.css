@@ -225,7 +225,7 @@ input:disabled {
 
 .room-lobby {
     padding: 0 2rem;
-    min-width: 900px;
+    min-width: min(80%, 900px);
 }
 
 .room {
@@ -374,8 +374,8 @@ input:disabled {
     font-weight: bold;
     text-align: center;
     margin-top: 15px;
-    font-size: max(1.5vw, 18px);
-    width: 15vh;
+    font-size: max(2vh, 18px);
+    max-width: min(12vh, 300px);
     white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -383,8 +383,8 @@ input:disabled {
 
 .flip-card {
     background-color: transparent;
-    width: 12vh;
-    height: 15vh;
+    width: min(12vh, 100px);
+    height: min(15vh, 125px);
     perspective: 1000px;
 }
 
@@ -428,7 +428,7 @@ input:disabled {
     background-color: white;
     transform: rotateY(180deg);
     border-radius: 8px;
-    font-size: 8vh;
+    font-size: min(8vh, 55px);
 }
 
 .highlight-vote {
@@ -441,7 +441,7 @@ input:disabled {
     position: absolute;
     top: .5vh;
     left: 1.5vh;
-    font-size: 2.5vh;
+    font-size: min(2.5vh, 20px);
     font-weight: bold;
     z-index: 2;
 }
@@ -451,7 +451,7 @@ input:disabled {
 }
 
 .outside-vote {
-    font-size: 2.3vh;
+    font-size: min(2.5vh, 20px);
     color: var(--higher-vote);
 }
 

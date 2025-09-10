@@ -66,17 +66,38 @@ function handleShowVotes(room) {
 
   let votes = room.votes;
   let allVoted = playerIds.every(id => votes[id] !== undefined);
+
   room.showVotes = allVoted;
   room.isVoting = allVoted ? false : playerIds.some(id => votes[id] !== undefined);
+
   let values = Object.values(votes);
-  room.showFireworks = values.length > 1 && values.every(v => v === values[0]);
+  room.showFireworks = allVoted && values.length > 1 && values.every(v => v === values[0]);
 
   console.log(room);
 }
 
+function updateVotes(room, io, roomId) {
+  handleShowVotes(room);
+
+  io.to(roomId).emit("votesUpdate", {
+    votes: room.votes,
+    showVotes: room.showVotes,
+    isVoting: room.isVoting,
+    showFireworks: room.showFireworks
+  });
+}
+
 module.exports = (io, rooms) => ({
   createRoom: (socket, {roomId, name, userId}) => {
-    rooms[roomId] = {viewers: {}, dealer: {name, userId}, voters: {}, votes: {}, showVotes: false, isVoting: false, showFireworks: false};
+    rooms[roomId] = {
+      viewers: {},
+      dealer: {name, userId},
+      voters: {},
+      votes: {},
+      showVotes: false,
+      isVoting: false,
+      showFireworks: false
+    };
 
     socket.join(roomId);
     io.to(roomId).emit("roomUpdate", rooms[roomId]);
@@ -150,9 +171,8 @@ module.exports = (io, rooms) => ({
     const room = rooms[roomId];
 
     room.votes[userId] = vote;
-    handleShowVotes(room);
 
-    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes, isVoting: room.isVoting, showFireworks: room.showFireworks});
+    updateVotes(room, io, roomId);
   },
 
   clearVote: (socket, {roomId, userId}) => {
@@ -160,9 +180,8 @@ module.exports = (io, rooms) => ({
     const room = rooms[roomId];
 
     delete room.votes[userId];
-    handleShowVotes(room);
 
-    io.to(roomId).emit("votesUpdate", {votes: room.votes, showVotes: room.showVotes, isVoting: room.isVoting, showFireworks: room.showFireworks});
+    updateVotes(room, io, roomId);
   },
 
   requestRooms: (io) => {
@@ -174,6 +193,7 @@ module.exports = (io, rooms) => ({
     if (found) {
       socket.leave(roomId);
       io.to(roomId).emit("voterUpdate", rooms[roomId].voters);
+      updateVotes(rooms[roomId], io, roomId);
     }
   },
 
@@ -183,7 +203,9 @@ module.exports = (io, rooms) => ({
     if (found) {
       console.log("Voter leave viewer viewer:", rooms[roomId]);
       socket.leave(roomId);
-      io.to(roomId).emit("viewerUpdate", {viewers: rooms[roomId].viewers, dealer: rooms[roomId].dealer});
+      io.to(roomId).emit("viewerUpdate", {
+        viewers: rooms[roomId].viewers,
+        dealer: rooms[roomId].dealer});
     }
   },
 

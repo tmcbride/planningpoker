@@ -20,7 +20,6 @@ export function DealerControls() {
         fetch(`${apiUrl}/api/projects`)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data);
                 setBoardList(data.values);
             })
             .catch((err) => console.error("Error fetching projects:", err));
