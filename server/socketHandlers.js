@@ -53,7 +53,7 @@ function removeUserBySocketId(rooms, roomId, socketId) {
 function refreshRooms(rooms, io) {
     const roomList = Object.keys(rooms).map(roomId => ({
         id: roomId,
-        playerCount: Object.values(rooms[roomId].voters).filter(([voter]) => voter.removed !== true).length
+        playerCount: Object.values(rooms[roomId].voters).filter(voter => voter.removed !== true).length
     }));
     console.log("Sending Rooms: ", roomList);
     io.emit("roomsList", roomList);
