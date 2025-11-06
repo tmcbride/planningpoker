@@ -10,12 +10,10 @@ const PORT = process.env.PORT || 4000;
 
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
-    // Optionally: clean up resources, notify, etc.
 });
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection:', reason);
-    // Optionally: clean up resources, notify, etc.
 });
 
 const app = express();
