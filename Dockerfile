@@ -4,10 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-COPY .env .
-
-COPY .env ./client
-
 RUN npm install
 
 RUN npm run build
