@@ -1,7 +1,5 @@
-const fs = require('fs');
 const express = require("express");
 const router = express.Router();
-const path = require("path");
 const axios = require('axios');
 
 const BOARD_CACHE_TTL = 1000 * 60 * 1000;
@@ -58,6 +56,7 @@ module.exports = (rooms) => {
       console.log("Got Board list from Cache");
       return boardsCache.data;
     }
+
     const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board?type=scrum`;
     let data = await makeJiraCall(jiraUrl, now);
     boardsCache = {data: data, timestamp: now};

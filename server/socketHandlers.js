@@ -55,7 +55,6 @@ function refreshRooms(rooms, io) {
         id: roomId,
         playerCount: Object.values(rooms[roomId].voters).filter(voter => voter.removed !== true).length
     }));
-    console.log("Sending Rooms: ", roomList);
     io.emit("roomsList", roomList);
 }
 
@@ -72,8 +71,6 @@ function handleShowVotes(room) {
 
     let values = Object.values(votes);
     room.showFireworks = playerIds.length > 1 && allVoted && values.length > 1 && values.every(v => v === values[0]);
-
-    console.log(room);
 }
 
 function updateVotes(room, io, roomId) {
@@ -101,7 +98,6 @@ module.exports = (io, rooms) => ({
 
         socket.join(roomId);
         io.to(roomId).emit("roomUpdate", rooms[roomId]);
-        console.log(rooms);
         refreshRooms(rooms, io);
     },
 
@@ -123,8 +119,6 @@ module.exports = (io, rooms) => ({
         handleShowVotes(room);
 
         room.showFireworks = false;
-
-        console.log(room);
 
         io.to(roomId).emit("roomUpdate", room);
         socket.emit("roomUpdate", room);
@@ -151,8 +145,6 @@ module.exports = (io, rooms) => ({
         handleShowVotes(room);
 
         room.showFireworks = false;
-
-        console.log(room);
 
         io.to(roomId).emit("roomUpdate", room);
         socket.emit("roomUpdate", room);
@@ -203,9 +195,7 @@ module.exports = (io, rooms) => ({
 
     leaveRoomViewer: (socket, {roomId, userId}) => {
         let found = removeViewerFromRoom(rooms, roomId, userId);
-        console.log(found);
         if (found) {
-            console.log("Voter leave viewer viewer:", rooms[roomId]);
             socket.leave(roomId);
             io.to(roomId).emit("viewerUpdate", {
                 viewers: rooms[roomId].viewers,
@@ -233,8 +223,6 @@ module.exports = (io, rooms) => ({
     disconnect: (socket) => {
         console.log("Voter disconnected:", socket.id);
         for (const roomId of Object.keys(rooms)) {
-            console.log("Looking for:", socket.id, " in ", rooms[roomId]);
-
             let found = removeUserBySocketId(rooms, roomId, socket.id);
 
             if (found) {

@@ -22,7 +22,7 @@ function randomId(length = 12) {
 export function RoomProvider({children}) {
     const [room, setRoom] = useState(null);
     const [name, setName] = useState(localStorage.getItem("name"));
-    const [roomId, setRoomId] = useState(localStorage.getItem("roomId"));
+    const [roomId, setRoomId] = useState("");
     let initialState = loadOrGenerateUserId();
     const [currentUserId] = useState(initialState);
     const [ticket, setTicket] = useState(null);
@@ -160,9 +160,10 @@ export function RoomProvider({children}) {
         const savedRoomViewer = localStorage.getItem("roomIdViewer");
         const roomIdDealer = localStorage.getItem("roomIdDealer");
 
-        if (savedName && (roomIdDealer || savedRoom || savedRoomViewer)) {
+        if (!roomId && savedName && (roomIdDealer || savedRoom || savedRoomViewer)) {
             setName(savedName);
             if (savedRoom) {
+                console.log("Joining Room '" + roomId + "'");
                 setRoomId(savedRoom);
                 socket.emit("joinRoom", {roomId: savedRoom, name: savedName, userId: currentUserId});
             } else {
@@ -178,7 +179,9 @@ export function RoomProvider({children}) {
             return;
         }
 
-        if (!ticket) return toast("Enter a ticket");
+        if (!ticket) {
+            return toast("Enter a ticket");
+        }
 
         socket.emit("setTicket", {roomId, ticket: ticket});
     };

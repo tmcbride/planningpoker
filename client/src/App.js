@@ -19,7 +19,6 @@ function App() {
                 <div className="app-header-container">
                     <div className="app-title">
                         <h1>Scrum Poker</h1>
-                        <h3>Beta</h3>
                     </div>
 
                     {room && (
