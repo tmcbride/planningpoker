@@ -14,7 +14,7 @@ export function Dialog({open, message, onConfirm, onCancel}) {
                             <button className="modal-btn" onClick={onCancel}>No</button>
                         </div>
                     ) : (
-                        <button className="modal-btn" onClick={onCancel}>Ok</button>
+                        <button className="modal-btn" onClick={onCancel}>OK</button>
                     )}
                 </div>
             </div>

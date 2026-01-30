@@ -1,6 +1,7 @@
 :root {
     --primary: #4e8cff;
     --primary-dark: #1c60d6;
+    --primary-header: #8fa3c9;
     --accent: #ffb84d;
     --higher-vote: #ff1900;
     --highlight: green;
@@ -19,7 +20,6 @@ button {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    /*transition: all 0.2s ease-in-out;*/
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     margin: 0 0.5rem 0 0;
     height: 3rem;
@@ -28,13 +28,6 @@ button {
 
 button:hover {
     background: var(--primary-dark);
-    /*transform: translateY(-2px);*/
-    /*box-shadow: 0 6px 10px rgba(0, 0, 0, 0.25);*/
-}
-
-button:active {
-    /*transform: translateY(0);*/
-    /*box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);*/
 }
 
 button:disabled {
@@ -177,6 +170,11 @@ input:disabled {
     background: white;
     color: black;
     margin-right: 0;
+}
+
+.app-leave-button:hover {
+    background: var(--primary);
+    color:white;
 }
 
 /**** Dealer Controls ***/
