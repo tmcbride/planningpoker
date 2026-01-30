@@ -11,7 +11,7 @@ export function NameInput() {
     } = useRoom();
 
     const [dialogWarning, setDialogWarning] = useState(false);
-    const nameRegex = /^\s*\w{1,8}(?:\s+\w{1,8})?\s*$/;
+    const nameRegex = /^\s*\w+(?:\s+\w+)?\s*$/;
 
     const handleCreateRoom = () => {
         if (!roomId || !name || nameWarning) {
@@ -25,7 +25,7 @@ export function NameInput() {
 
     useEffect(() => {
         let validName = nameRegex.test(name);
-        setNameWarning(!validName || validName.length < 1);
+        setNameWarning(!validName);
     }, [name]);
 
     function cleanupName(e) {
@@ -36,7 +36,6 @@ export function NameInput() {
         <div className="name-input">
             <div data-tooltip-id="name-warning"
                  data-tooltip-html="Enter your first name (required) and last name (optional)<br/>
-                                    Each name must be 1–8 characters.<br/>
                                     Separate names with a space."
                  hidden={!nameWarning}
             >
@@ -52,7 +51,6 @@ export function NameInput() {
                 onBlur={(e) => cleanupName(e)}
             />
             <input
-
                 placeholder="Sprint Name"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
