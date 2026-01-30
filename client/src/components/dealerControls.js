@@ -1,5 +1,6 @@
 import {useRoom} from "../contexts/RoomContext";
 import {useEffect, useState} from "react";
+import {Tooltip} from "react-tooltip";
 
 export function DealerControls() {
     const {
@@ -16,6 +17,8 @@ export function DealerControls() {
     const [loading, setLoading] = useState(false);
     const [totalPoints, setTotalPoints] = useState(-1);
     const [ticketCount, setTicketCount] = useState(0);
+    const [targetPoints, setTargetPoints] = useState(null);
+    const [draftTargetPoints, setDraftTargetPoints] = useState("");
 
     useEffect(() => {
         fetch(`${apiUrl}/api/projects`)
@@ -134,15 +137,38 @@ export function DealerControls() {
             </div>
 
             {ticketCount > 0 && (
-                    <label className="sprint-metrics">
-                        <span className="sprint-title">Active Sprint</span>
-                        <span className="sprint-metric">
+                <label className="sprint-metrics">
+                    <span className="sprint-title">Active Sprint</span>
+                    <span className="sprint-metric">
                             Tickets: <strong>{ticketCount}</strong>
                         </span>
-                        <span className="sprint-metric">
+                    <span className="sprint-metric">
                             Points: <strong>{totalPoints}</strong>
                         </span>
-                    </label>
+                    <div data-tooltip-id="sprint-target" className="sprint-target-container"
+                         data-tooltip-html={totalPoints >= targetPoints ? totalPoints - targetPoints + " Over Target" : targetPoints - totalPoints + " Until Target Points"}
+                    >
+                        <div className="sprint-target-label">
+                            {!targetPoints ? (<div></div>) :
+                                totalPoints >= targetPoints ? (
+                                    <div>&#x2713;</div>
+                                ) : (
+                                    <div>&#43;</div>
+                                )}
+                        </div>
+
+                        <Tooltip id="sprint-target"/>
+                        <input
+                            data-tooltip-id="sprint-target"
+                            id="targetPoints"
+                            placeholder="Target"
+                            value={draftTargetPoints}
+                            onChange={(e) => setDraftTargetPoints(e.target.value)}
+                            onBlur={(e) => setTargetPoints(e.target.value)}
+                        />
+                    </div>
+
+                </label>
             )}
 
             <div className="ticket-list">

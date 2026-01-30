@@ -38,25 +38,27 @@ module.exports = (rooms) => {
   });
 
   router.get("/storyPoints/:projectId", async (req, res) => {
-    let jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/sprint?state=active`;
+    let retData = await loadSprintInfo(req.params.projectId);
+    res.json(retData);
+  });
+
+  async function loadSprintInfo(boardId) {
+    let jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${boardId}/sprint?state=active`;
     let data = await makeJiraCall(jiraUrl);
     console.log("Sprint Data: ", JSON.stringify(data, null, 2));
 
+    const retData = {
+      totalStoryPoints: -1,
+      ticketCount: 0
+    }
+
     if (!data) {
-      res.json({
-        totalStoryPoints: -1,
-        ticketCount: 0
-      });
-      return;
+      return retData;
     }
 
     let sprintId = data?.values[0]?.id;
     if (!sprintId) {
-      res.json({
-        totalStoryPoints: -1,
-        ticketCount: 0
-      });
-      return;
+      return retData;
     }
 
     jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/sprint/${sprintId}/issue`;
@@ -67,12 +69,10 @@ module.exports = (rooms) => {
       storyPoints: issue.fields.customfield_10003,
     }));
 
-    const totalStoryPoints = mappedTickets.reduce((sum, issue) => sum + (issue.storyPoints || 0), 0);
-    res.json({
-      totalStoryPoints: totalStoryPoints,
-      ticketCount: mappedTickets.length
-    });
-  });
+    retData.totalStoryPoints = mappedTickets.reduce((sum, issue) => sum + (issue.storyPoints || 0), 0);
+    retData.ticketCount = mappedTickets.length;
+    return retData;
+  }
 
   async function makeJiraCall(jiraUrl) {
     try {
