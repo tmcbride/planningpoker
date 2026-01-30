@@ -25,7 +25,7 @@ module.exports = (rooms) => {
   });
 
   router.get("/tickets/:projectId", async (req, res) => {
-    const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/backlog?maxResults=100&expand=renderedFields`; //&jql=fixVersion=${req.params.fixVersion}`;
+    const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/backlog?maxResults=100&expand=renderedFields`;
     let data = await makeJiraCall(jiraUrl);
     const mappedTickets = data.issues.map(issue => ({
       key: issue.key,
@@ -36,6 +36,46 @@ module.exports = (rooms) => {
     }));
     res.json(mappedTickets);
   });
+
+  router.get("/storyPoints/:projectId", async (req, res) => {
+    let retData = await loadSprintInfo(req.params.projectId);
+    res.json(retData);
+  });
+
+  async function loadSprintInfo(boardId) {
+    let jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${boardId}/sprint?state=active,future`;
+    let data = await makeJiraCall(jiraUrl);
+    let latest = data.values
+        .filter(s => s.startDate)
+        .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
+    console.log("Sprint Data: ", JSON.stringify(latest, null, 2));
+
+    const retData = {
+      totalStoryPoints: 0,
+      ticketCount: 0
+    }
+
+    if (!latest) {
+      return retData;
+    }
+
+    let sprintId = latest.id;
+    if (!sprintId) {
+      return retData;
+    }
+
+    jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/sprint/${sprintId}/issue`;
+
+    latest = await makeJiraCall(jiraUrl);
+
+    const mappedTickets = latest.issues.map(issue => ({
+      storyPoints: issue.fields.customfield_10003,
+    }));
+
+    retData.totalStoryPoints = mappedTickets.reduce((sum, issue) => sum + (issue.storyPoints || 0), 0);
+    retData.ticketCount = mappedTickets.length;
+    return retData;
+  }
 
   async function makeJiraCall(jiraUrl) {
     try {

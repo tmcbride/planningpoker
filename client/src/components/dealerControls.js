@@ -1,5 +1,6 @@
 import {useRoom} from "../contexts/RoomContext";
 import {useEffect, useState} from "react";
+import {Tooltip} from "react-tooltip";
 
 export function DealerControls() {
     const {
@@ -9,12 +10,15 @@ export function DealerControls() {
     } = useRoom();
 
     const [board, setBoard] = useState(null);
-    const [projectVersion, setProjectVersion] = useState("");
     const [boardList, setBoardList] = useState([]);
     const [ticketList, setTicketList] = useState([]);
     const apiUrl = process.env.REACT_APP_API_URL ?? "/poker";
     const [hideWithStoryPoints, setHideWithStoryPoints] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [totalPoints, setTotalPoints] = useState(-1);
+    const [ticketCount, setTicketCount] = useState(0);
+    const [targetPoints, setTargetPoints] = useState(null);
+    const [draftTargetPoints, setDraftTargetPoints] = useState(null);
 
     useEffect(() => {
         fetch(`${apiUrl}/api/projects`)
@@ -29,18 +33,63 @@ export function DealerControls() {
         if (!board) return;
 
         setLoading(true);
+        getCurrentStoryPoints();
 
-        fetch(`${apiUrl}/api/tickets/${board.id}/${projectVersion}`)
+        fetch(`${apiUrl}/api/tickets/${board.id}`)
             .then(res => res.json())
             .then(data => {
                 setTicketList(data);
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Error fetching rooms:", err);
+                console.error("Error fetching tickets:", err);
                 setLoading(false);
             });
     }
+
+    function getCurrentStoryPoints() {
+        if (!board) {
+            setTotalPoints(0);
+            setTicketCount(0);
+            return;
+        }
+
+        fetch(`${apiUrl}/api/storyPoints/${board.id}`)
+            .then(res => res.json())
+            .then(data => {
+                setTotalPoints(data.totalStoryPoints);
+                setTicketCount(data.ticketCount);
+            })
+            .catch(err => {
+                console.error("Error getting story points:", err);
+                setTotalPoints(0);
+                setTicketCount(0);
+            });
+    }
+
+    useEffect(() => {
+        let intervalId;
+
+        if (board) {
+            getCurrentStoryPoints();
+            intervalId = setInterval(() => {
+                getCurrentStoryPoints();
+            }, 10000);
+        } else {
+            setTotalPoints(0);
+            setTicketCount(0);
+
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        }
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [board]);
 
     useEffect(() => {
         loadTicketsForBoard();
@@ -87,6 +136,50 @@ export function DealerControls() {
                     Reload
                 </button>
             </div>
+
+            {board && (
+                <label className="sprint-metrics">
+                    <span className="sprint-title">Sprint Totals</span>
+                    <div className="sprint-metrics-container">
+                        <span className="sprint-metric">
+                            Tickets: <strong>{ticketCount}</strong>
+                        </span>
+                        <span className="sprint-metric">
+                            Points: <strong>{totalPoints}</strong>
+                        </span>
+
+
+                        <div className="sprint-target-container"
+                             data-tooltip-id="sprint-target"
+                             data-tooltip-html={!targetPoints || totalPoints < 1 ? "" :
+                                 (totalPoints >= targetPoints ?
+                                     totalPoints - targetPoints + " point(s) over" :
+                                     targetPoints - totalPoints + " point(s) remaining")}
+                        >
+                            <label>
+                                Target:
+                            </label>
+                            <input
+                                id="targetPoints"
+                                value={draftTargetPoints}
+                                onChange={(e) => setDraftTargetPoints(e.target.value)}
+                                onBlur={(e) => setTargetPoints(e.target.value)}
+                            />
+                            <div className="sprint-target-label"
+
+                            >
+                                {!targetPoints ? (<div></div>) :
+                                    totalPoints >= targetPoints ? (
+                                        <div>&#x2713;</div>
+                                    ) : (
+                                        <div>&nbsp;</div>
+                                    )}
+                            </div>
+                            <Tooltip id="sprint-target"/>
+                        </div>
+                    </div>
+                </label>
+            )}
 
             <div className="ticket-list">
                 {loading ? (
