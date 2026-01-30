@@ -25,7 +25,7 @@ module.exports = (rooms) => {
   });
 
   router.get("/tickets/:projectId", async (req, res) => {
-    const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/backlog?maxResults=100&expand=renderedFields`; //&jql=fixVersion=${req.params.fixVersion}`;
+    const jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/backlog?maxResults=100&expand=renderedFields`;
     let data = await makeJiraCall(jiraUrl);
     const mappedTickets = data.issues.map(issue => ({
       key: issue.key,
@@ -35,6 +35,43 @@ module.exports = (rooms) => {
       link: `${process.env.BASE_JIRA_URL}/browse/${issue.key}`
     }));
     res.json(mappedTickets);
+  });
+
+  router.get("/storyPoints/:projectId", async (req, res) => {
+    let jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${req.params.projectId}/sprint?state=active`;
+    let data = await makeJiraCall(jiraUrl);
+    console.log("Sprint Data: ", JSON.stringify(data, null, 2));
+
+    if (!data) {
+      res.json({
+        totalStoryPoints: -1,
+        ticketCount: 0
+      });
+      return;
+    }
+
+    let sprintId = data?.values[0]?.id;
+    if (!sprintId) {
+      res.json({
+        totalStoryPoints: -1,
+        ticketCount: 0
+      });
+      return;
+    }
+
+    jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/sprint/${sprintId}/issue`;
+
+    data = await makeJiraCall(jiraUrl);
+
+    const mappedTickets = data.issues.map(issue => ({
+      storyPoints: issue.fields.customfield_10003,
+    }));
+
+    const totalStoryPoints = mappedTickets.reduce((sum, issue) => sum + (issue.storyPoints || 0), 0);
+    res.json({
+      totalStoryPoints: totalStoryPoints,
+      ticketCount: mappedTickets.length
+    });
   });
 
   async function makeJiraCall(jiraUrl) {

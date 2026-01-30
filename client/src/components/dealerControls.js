@@ -9,12 +9,13 @@ export function DealerControls() {
     } = useRoom();
 
     const [board, setBoard] = useState(null);
-    const [projectVersion, setProjectVersion] = useState("");
     const [boardList, setBoardList] = useState([]);
     const [ticketList, setTicketList] = useState([]);
     const apiUrl = process.env.REACT_APP_API_URL ?? "/poker";
     const [hideWithStoryPoints, setHideWithStoryPoints] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [totalPoints, setTotalPoints] = useState(-1);
+    const [ticketCount, setTicketCount] = useState(0);
 
     useEffect(() => {
         fetch(`${apiUrl}/api/projects`)
@@ -29,18 +30,62 @@ export function DealerControls() {
         if (!board) return;
 
         setLoading(true);
+        getCurrentStoryPoints();
 
-        fetch(`${apiUrl}/api/tickets/${board.id}/${projectVersion}`)
+        fetch(`${apiUrl}/api/tickets/${board.id}`)
             .then(res => res.json())
             .then(data => {
                 setTicketList(data);
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Error fetching rooms:", err);
+                console.error("Error fetching tickets:", err);
                 setLoading(false);
             });
     }
+
+    function getCurrentStoryPoints() {
+        if (!board) {
+            setTotalPoints(-1);
+            setTicketCount(0);
+            return;
+        }
+
+        fetch(`${apiUrl}/api/storyPoints/${board.id}`)
+            .then(res => res.json())
+            .then(data => {
+                setTotalPoints(data.totalStoryPoints);
+                setTicketCount(data.ticketCount);
+            })
+            .catch(err => {
+                console.error("Error getting story points:", err);
+                setTotalPoints(-1);
+                setTicketCount(0);
+            });
+    }
+
+    useEffect(() => {
+        let intervalId;
+
+        if (board) {
+            getCurrentStoryPoints();
+            intervalId = setInterval(() => {
+                getCurrentStoryPoints();
+            }, 10000);
+        } else {
+            setTotalPoints(-1);
+            setTicketCount(0);
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        }
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [board]);
 
     useEffect(() => {
         loadTicketsForBoard();
@@ -87,6 +132,18 @@ export function DealerControls() {
                     Reload
                 </button>
             </div>
+
+            {ticketCount > 0 && (
+                    <label className="sprint-metrics">
+                        <span className="sprint-title">Active Sprint</span>
+                        <span className="sprint-metric">
+                            Tickets: <strong>{ticketCount}</strong>
+                        </span>
+                        <span className="sprint-metric">
+                            Points: <strong>{totalPoints}</strong>
+                        </span>
+                    </label>
+            )}
 
             <div className="ticket-list">
                 {loading ? (
