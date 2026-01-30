@@ -224,31 +224,47 @@ input:disabled {
 
 .sprint-metrics {
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap; /* Allows wrapping if needed on smaller screens */
-    gap: 15px; /* Spacing between items */
     align-items: center; /* Vertically aligns items in the center */
     max-width: 1200px; /* Optional: Set a max-width for the content */
     width: 100%; /* Ensures it spans the full width of its parent */
     background-color: white; /* Background color for the metrics section */
     padding: 5px 15px 0px 5px; /* Adds padding around the content */
+    column-gap: 1.5rem;
+    row-gap: .5rem;
+
+    justify-content: center;
 }
 
 .sprint-metrics input {
-    width: 75%
+    font-family: monospace;
+    width: 4ch;
+    padding: .5ch 0.5ch;
+    box-sizing: content-box;
+}
+
+.sprint-metrics-container {
+    display: flex;
+    flex-direction: row;
+    column-gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .sprint-target-container {
     display: flex;
-    width: 25%;
     align-items: center;
-    margin-left: auto;
+    justify-content: center;
+
 }
 
 .sprint-target-label {
-    color:green;
+    color: green;
     font-size: 2rem;
     font-weight: bold;
-    width:25%;
+    width: 25%;
+    height: 100%
 }
 
 .sprint-title {

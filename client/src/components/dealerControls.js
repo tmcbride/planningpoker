@@ -18,7 +18,7 @@ export function DealerControls() {
     const [totalPoints, setTotalPoints] = useState(-1);
     const [ticketCount, setTicketCount] = useState(0);
     const [targetPoints, setTargetPoints] = useState(null);
-    const [draftTargetPoints, setDraftTargetPoints] = useState("");
+    const [draftTargetPoints, setDraftTargetPoints] = useState(null);
 
     useEffect(() => {
         fetch(`${apiUrl}/api/projects`)
@@ -49,7 +49,7 @@ export function DealerControls() {
 
     function getCurrentStoryPoints() {
         if (!board) {
-            setTotalPoints(-1);
+            setTotalPoints(0);
             setTicketCount(0);
             return;
         }
@@ -62,7 +62,7 @@ export function DealerControls() {
             })
             .catch(err => {
                 console.error("Error getting story points:", err);
-                setTotalPoints(-1);
+                setTotalPoints(0);
                 setTicketCount(0);
             });
     }
@@ -76,8 +76,9 @@ export function DealerControls() {
                 getCurrentStoryPoints();
             }, 10000);
         } else {
-            setTotalPoints(-1);
+            setTotalPoints(0);
             setTicketCount(0);
+
             if (intervalId) {
                 clearInterval(intervalId);
             }
@@ -136,38 +137,47 @@ export function DealerControls() {
                 </button>
             </div>
 
-            {ticketCount > 0 && (
+            {board && (
                 <label className="sprint-metrics">
-                    <span className="sprint-title">Active Sprint</span>
-                    <span className="sprint-metric">
+                    <span className="sprint-title">Sprint Totals</span>
+                    <div className="sprint-metrics-container">
+                        <span className="sprint-metric">
                             Tickets: <strong>{ticketCount}</strong>
                         </span>
-                    <span className="sprint-metric">
+                        <span className="sprint-metric">
                             Points: <strong>{totalPoints}</strong>
                         </span>
-                    <div data-tooltip-id="sprint-target" className="sprint-target-container"
-                         data-tooltip-html={totalPoints >= targetPoints ? totalPoints - targetPoints + " Over Target" : targetPoints - totalPoints + " Until Target Points"}
-                    >
-                        <div className="sprint-target-label">
-                            {!targetPoints ? (<div></div>) :
-                                totalPoints >= targetPoints ? (
-                                    <div>&#x2713;</div>
-                                ) : (
-                                    <div>&#43;</div>
-                                )}
+
+
+                        <div className="sprint-target-container"
+                             data-tooltip-id="sprint-target"
+                             data-tooltip-html={!targetPoints || totalPoints < 1 ? "" :
+                                 (totalPoints >= targetPoints ?
+                                     totalPoints - targetPoints + " point(s) over" :
+                                     targetPoints - totalPoints + " point(s) remaining")}
+                        >
+                            <label>
+                                Target:
+                            </label>
+                            <input
+                                id="targetPoints"
+                                value={draftTargetPoints}
+                                onChange={(e) => setDraftTargetPoints(e.target.value)}
+                                onBlur={(e) => setTargetPoints(e.target.value)}
+                            />
+                            <div className="sprint-target-label"
+
+                            >
+                                {!targetPoints ? (<div></div>) :
+                                    totalPoints >= targetPoints ? (
+                                        <div>&#x2713;</div>
+                                    ) : (
+                                        <div>&nbsp;</div>
+                                    )}
+                            </div>
+                            <Tooltip id="sprint-target"/>
                         </div>
-
-                        <Tooltip id="sprint-target"/>
-                        <input
-                            data-tooltip-id="sprint-target"
-                            id="targetPoints"
-                            placeholder="Target"
-                            value={draftTargetPoints}
-                            onChange={(e) => setDraftTargetPoints(e.target.value)}
-                            onBlur={(e) => setTargetPoints(e.target.value)}
-                        />
                     </div>
-
                 </label>
             )}
 

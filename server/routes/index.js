@@ -43,29 +43,32 @@ module.exports = (rooms) => {
   });
 
   async function loadSprintInfo(boardId) {
-    let jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${boardId}/sprint?state=active`;
+    let jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/board/${boardId}/sprint?state=active,future`;
     let data = await makeJiraCall(jiraUrl);
-    console.log("Sprint Data: ", JSON.stringify(data, null, 2));
+    let latest = data.values
+        .filter(s => s.startDate)
+        .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
+    console.log("Sprint Data: ", JSON.stringify(latest, null, 2));
 
     const retData = {
-      totalStoryPoints: -1,
+      totalStoryPoints: 0,
       ticketCount: 0
     }
 
-    if (!data) {
+    if (!latest) {
       return retData;
     }
 
-    let sprintId = data?.values[0]?.id;
+    let sprintId = latest.id;
     if (!sprintId) {
       return retData;
     }
 
     jiraUrl = `${process.env.BASE_JIRA_URL}/rest/agile/1.0/sprint/${sprintId}/issue`;
 
-    data = await makeJiraCall(jiraUrl);
+    latest = await makeJiraCall(jiraUrl);
 
-    const mappedTickets = data.issues.map(issue => ({
+    const mappedTickets = latest.issues.map(issue => ({
       storyPoints: issue.fields.customfield_10003,
     }));
 
